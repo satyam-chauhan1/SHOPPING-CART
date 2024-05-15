@@ -83,7 +83,7 @@ if (isset($_GET['for'])) {
                         </div>
                     </div>
             <?php
-                }
+                } 
             } else {
                 echo '<h6 class="text-center">No products found. Please try again with different products.</h6>';
             }
