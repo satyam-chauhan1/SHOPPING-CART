@@ -96,14 +96,11 @@ if (isset($_GET['for'])) {
             $('.color-link').click(function(e) {
                 e.preventDefault();
                 var imageSrc = $(this).data('image');
-                var newPrice = $(this).data('price');
                 var productId = $(this).data('product-id');
 
                 // Update main product image
                 $('.main-image-' + productId).attr('src', imageSrc);
 
-                // Update main product price
-                $('#main-price-' + productId).html('₹' + newPrice + '<del>₹' + defaultPrice + '</del>');
             });
         });
     </script>
