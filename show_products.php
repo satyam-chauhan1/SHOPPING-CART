@@ -71,7 +71,23 @@ if (isset($_GET['for'])) {
                                 <?php foreach ($product['relatedProducts'] as $relatedProduct) : ?>
                                     <?php if ($relatedProduct['PRODUCT_FEATURE_TYPE'] === 'COLOR') : ?>
                                         <div class="d-inline-block mr-1">
-                                            <a class="color-link" href="#" data-name="<?php echo $relatedProduct['PRODUCT_NAME']; ?>" data-color="<?php echo $relatedProduct['COLOR']; ?>" data-image="<?php echo $relatedProduct['PRODUCT_IMAGE']; ?>" data-sizes='<?php echo json_encode($relatedProduct['SIZE']); ?>' data-product-id="<?php echo $product['MAIN_PRODUCT_ID']; ?>">
+                                            
+                                            <?php 
+                                            $relatedProductId = $relatedProduct['RELATED_PRODUCT_ID'];
+                                            $filteredArray = array_filter($product['relatedProducts'], function($item) use ($relatedProductId) {
+                                                return $item['PRODUCT_FEATURE_TYPE'] === 'SIZE' && $item['RELATED_PRODUCT_ID'] === $relatedProductId;
+                                            });
+                                            $outputArray = [];
+                                            
+                                            foreach ($filteredArray as $item) {
+                                                $size = $item['SIZE'];
+                                                $price = $item['PRICE'];
+                                                $outputArray[$size] = $price;
+                                            }
+                                            
+                                            ?>
+
+                                            <a class="color-link" href="#" data-name="<?php echo $relatedProduct['PRODUCT_NAME']; ?>" data-color="<?php echo $relatedProduct['COLOR']; ?>" data-image="<?php echo $relatedProduct['PRODUCT_IMAGE']; ?>" data-sizes='<?php echo json_encode($outputArray); ?>' data-product-id="<?php echo $product['MAIN_PRODUCT_ID']; ?>">
                                                 <div class="rounded-circle p-2 mx-auto mb-2 border" style="width: 25px; height: 25px; background-color: <?php echo $relatedProduct['COLOR']; ?>"></div>
                                             </a>
                                         </div>
@@ -85,7 +101,7 @@ if (isset($_GET['for'])) {
                         </div>
                     </div>
             <?php
-                } 
+                }
             } else {
                 echo '<h6 class="text-center">No products found. Please try again with different products.</h6>';
             }
@@ -94,42 +110,61 @@ if (isset($_GET['for'])) {
     </div>
 
     <script>
-        $(document).ready(function() {
-            $('.color-link').click(function(e) {
-                e.preventDefault();
-                var imageSrc = $(this).data('image');
-                var newName = $(this).data('name');
-                var sizes = $(this).data('sizes');
-                var productId = $(this).data('product-id');
+    $(document).ready(function() {
+        $('.color-link').click(function(e) {
+            e.preventDefault();
+            var imageSrc = $(this).data('image');
+            var newName = $(this).data('name');
+            var sizes = $(this).data('sizes');
+            var productId = $(this).data('product-id');
+            console.log(imageSrc)
+            console.log(newName)
+            console.log(sizes)
+            console.log(productId)
 
-                // Update main product image
-                $('.main-image-' + productId).attr('src', imageSrc);
+            // Update main product image
+            $('.main-image-' + productId).attr('src', imageSrc);
 
-                // Update main product name
-                $('.main-name-' + productId).text(newName);
+            // Update main product name
+            $('.main-name-' + productId).text(newName);
 
-                // Update main product sizes
-                var sizesDiv = $('#sizes-' + productId);
-                sizesDiv.empty(); // Clear the existing sizes
+            // Update main product sizes
+            var sizesDiv = $('#sizes-' + productId);
+            sizesDiv.empty(); // Clear the existing sizes
 
-                $.each(sizes, function(size, price) {
-                    sizesDiv.append('<div class="d-inline-block rounded-circle border ml-2 mb-2 size-link" style="width: 25px; height: 25px; cursor: pointer;" data-price="' + price + '" data-product-id="' + productId + '">' + size + '</div>');
-                });
-
-                // Update price for the main product
-                $('#main-price-' + productId + ' .price-value').text($(this).data('price'));
+            $.each(sizes, function(size, price) {
+                sizesDiv.append('<div class="d-inline-block rounded-circle border ml-2 mb-2 size-link" style="width: 25px; height: 25px; cursor: pointer;" data-price="' + price + '" data-product-id="' + productId + '">' + size + '</div>');
             });
 
-            // Handle size click events
-            $(document).on('click', '.size-link', function() {
-                var newPrice = $(this).data('price');
-                var productId = $(this).data('product-id');
-
-                // Update the price display
-                $('#main-price-' + productId + ' .price-value').text(newPrice);
-            });
+            // Update price for the main product
+            $('#main-price-' + productId + ' .price-value').text($(this).data('price'));
         });
-    </script>
+
+        // Handle size click events
+        $(document).on('click', '.size-link', function() {
+            var newPrice = $(this).data('price');
+            var productId = $(this).data('product-id');
+
+            // Update the price display
+            $('#main-price-' + productId + ' .price-value').text(newPrice);
+
+            // Remove the 'selected-size' class from all size links within the same product
+            $('#sizes-' + productId + ' .size-link').removeClass('selected-size');
+
+            // Add the 'selected-size' class to the clicked size link
+            $(this).addClass('selected-size');
+        });
+    });
+</script>
+
+
+
+<style>
+    .selected-size {
+        background-color: #6c757d; /* Change this color to your preferred selection color */
+        color: #fff; /* Change text color fo */
+    }
+</style>
 
 </body>
 
