@@ -31,10 +31,7 @@ if (isset($_GET['for'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>Show products</title>
-
 </head>
-
-
 
 <body class="bg-light">
 
@@ -53,19 +50,20 @@ if (isset($_GET['for'])) {
                             <img src="<?php echo $product['MAIN_PRO_IMAGE']; ?>" alt="shoes" class="img-fluid border-bottom main-image-<?php echo $product['MAIN_PRODUCT_ID']; ?>">
 
                             <a class="text-decoration-none" href="#">
-                                <p class="text-center text-dark my-2 ml-2 small" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                                <p class="text-center text-dark my-2 ml-2 small main-name-<?php echo $product['MAIN_PRODUCT_ID']; ?>" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
                                     <?php echo $product['MAIN_PRO_NAME']; ?>
                                 </p>
                             </a>
 
-                            <p id="main-price-<?php echo $product['MAIN_PRODUCT_ID']; ?>" class="ml-2 text-center text-success small">&#8377;<?php echo $product['MAIN_PRO_PRICE']; ?>
+                            <p id="main-price-<?php echo $product['MAIN_PRODUCT_ID']; ?>" class="ml-2 text-center text-success small">
+                                &#8377;<span class="price-value"><?php echo $product['MAIN_PRO_PRICE']; ?></span>
                                 <del>&#8377;<?php echo $product['MAIN_PRO_DEFAULT_PRICE']; ?></del>
                             </p>
 
                             <div class="text-center">
                                 <!-- main product color  -->
                                 <div class="d-inline-block mr-1">
-                                    <a class="color-link" href="#" data-color="<?php echo $product['MAIN_PRO_COLOR']; ?>" data-image="<?php echo $product['MAIN_PRO_IMAGE']; ?>" data-price="<?php echo $product['MAIN_PRO_PRICE']; ?>" data-product-id="<?php echo $product['MAIN_PRODUCT_ID']; ?>">
+                                    <a class="color-link" href="#" data-color="<?php echo $product['MAIN_PRO_COLOR']; ?>" data-image="<?php echo $product['MAIN_PRO_IMAGE']; ?>" data-price="<?php echo $product['MAIN_PRO_PRICE']; ?>" data-name="<?php echo $product['MAIN_PRO_NAME']; ?>" data-sizes='<?php echo json_encode($product['MAIN_PRO_SIZES']); ?>' data-product-id="<?php echo $product['MAIN_PRODUCT_ID']; ?>">
                                         <div class="rounded-circle p-2 mx-auto mb-2 border" style="width: 25px; height: 25px; background-color: <?php echo $product['MAIN_PRO_COLOR']; ?>"></div>
                                     </a>
                                 </div>
@@ -73,17 +71,21 @@ if (isset($_GET['for'])) {
                                 <?php foreach ($product['relatedProducts'] as $relatedProduct) : ?>
                                     <?php if ($relatedProduct['PRODUCT_FEATURE_TYPE'] === 'COLOR') : ?>
                                         <div class="d-inline-block mr-1">
-                                            <a class="color-link" href="#" data-color="<?php echo $relatedProduct['COLOR']; ?>" data-image="<?php echo $relatedProduct['PRODUCT_IMAGE']; ?>" data-price="<?php echo $relatedProduct['PRICE']; ?>" data-product-id="<?php echo $product['MAIN_PRODUCT_ID']; ?>">
+                                            <a class="color-link" href="#" data-name="<?php echo $relatedProduct['PRODUCT_NAME']; ?>" data-color="<?php echo $relatedProduct['COLOR']; ?>" data-image="<?php echo $relatedProduct['PRODUCT_IMAGE']; ?>" data-sizes='<?php echo json_encode($relatedProduct['SIZE']); ?>' data-product-id="<?php echo $product['MAIN_PRODUCT_ID']; ?>">
                                                 <div class="rounded-circle p-2 mx-auto mb-2 border" style="width: 25px; height: 25px; background-color: <?php echo $relatedProduct['COLOR']; ?>"></div>
                                             </a>
                                         </div>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
                             </div>
+                            <!-- Size display -->
+                            <div id="sizes-<?php echo $product['MAIN_PRODUCT_ID']; ?>" class="text-center mt-2">
+                                <!-- Sizes will be displayed here when a color is clicked -->
+                            </div>
                         </div>
                     </div>
             <?php
-                }
+                } 
             } else {
                 echo '<h6 class="text-center">No products found. Please try again with different products.</h6>';
             }
@@ -96,21 +98,38 @@ if (isset($_GET['for'])) {
             $('.color-link').click(function(e) {
                 e.preventDefault();
                 var imageSrc = $(this).data('image');
-                var newPrice = $(this).data('price');
+                var newName = $(this).data('name');
+                var sizes = $(this).data('sizes');
                 var productId = $(this).data('product-id');
 
                 // Update main product image
                 $('.main-image-' + productId).attr('src', imageSrc);
 
-                // Update main product price
-                $('#main-price-' + productId).html('₹' + newPrice + '<del>₹' + defaultPrice + '</del>');
+                // Update main product name
+                $('.main-name-' + productId).text(newName);
+
+                // Update main product sizes
+                var sizesDiv = $('#sizes-' + productId);
+                sizesDiv.empty(); // Clear the existing sizes
+
+                $.each(sizes, function(size, price) {
+                    sizesDiv.append('<div class="d-inline-block rounded-circle border ml-2 mb-2 size-link" style="width: 25px; height: 25px; cursor: pointer;" data-price="' + price + '" data-product-id="' + productId + '">' + size + '</div>');
+                });
+
+                // Update price for the main product
+                $('#main-price-' + productId + ' .price-value').text($(this).data('price'));
+            });
+
+            // Handle size click events
+            $(document).on('click', '.size-link', function() {
+                var newPrice = $(this).data('price');
+                var productId = $(this).data('product-id');
+
+                // Update the price display
+                $('#main-price-' + productId + ' .price-value').text(newPrice);
             });
         });
-
-
-        
     </script>
-
 
 </body>
 

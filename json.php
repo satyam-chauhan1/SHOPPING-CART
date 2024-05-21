@@ -79,7 +79,7 @@ function fetchProductJson($category) {
             // Output the related product IDs
             $related_product_data = array();
             foreach ($related_products as $related_product) {
-                $relatedProductQuery = "SELECT p.PRODUCT_ID,p.IMAGE, pf.*
+                $relatedProductQuery = "SELECT p.PRODUCT_ID,p.IMAGE,p.PRICE,p.NAME, pf.*
             FROM product AS p
             LEFT JOIN product_feature_appl pfa ON pfa.PRODUCT_ID = p.PRODUCT_ID
             LEFT JOIN product_feature pf ON pf.PRODUCT_FEATURE_ID = pfa.PRODUCT_FEATURE_ID
@@ -97,6 +97,7 @@ function fetchProductJson($category) {
                         );
                 
                         if ($relatedRow['PRODUCT_FEATURE_TYPE'] == 'COLOR') {
+                            $related_product_data[count($related_product_data) - 1]["PRODUCT_NAME"] = $relatedRow['NAME'];
                             $related_product_data[count($related_product_data) - 1]["PRODUCT_IMAGE"] = $relatedRow['IMAGE'];
                             $related_product_data[count($related_product_data) - 1]["COLOR"] = $relatedRow['DESCRIPTION'];
                         } elseif ($relatedRow['PRODUCT_FEATURE_TYPE'] == 'SIZE') {
