@@ -2,19 +2,18 @@
 function fetchProductJson($category) {
     require 'db_connect.php';
 
-    function fetchProducts($conn,$category)
-    {
+    function fetchProducts($conn, $category) {
         // Fetch data from tables
-        $query = "SELECT p.PRODUCT_ID, p.NAME, p.IMAGE,p.PRICE, p.DEFAULT_PRICE, p.DISABLE, pf.PRODUCT_FEATURE_TYPE, pf.DESCRIPTION, pf.PRODUCT_PRICE
-              FROM product p
-              LEFT JOIN product_feature_appl pfa ON p.PRODUCT_ID = pfa.PRODUCT_ID
-              LEFT JOIN product_feature pf ON pfa.PRODUCT_FEATURE_ID = pf.PRODUCT_FEATURE_ID 
-              WHERE p.DISABLE='N'
-              AND p.PRODUCT_CATEGORY_ID='$category'
-              AND NOT EXISTS (
-                  SELECT 1 FROM product_assoc pa 
-                  WHERE pa.PRODUCT_ID_TO = p.PRODUCT_ID
-              )";
+        $query = "SELECT p.PRODUCT_ID, p.NAME, p.IMAGE, p.PRICE, p.DEFAULT_PRICE, p.DISABLE, pf.PRODUCT_FEATURE_TYPE, pf.DESCRIPTION, pf.PRODUCT_PRICE
+                  FROM product p
+                  LEFT JOIN product_feature_appl pfa ON p.PRODUCT_ID = pfa.PRODUCT_ID
+                  LEFT JOIN product_feature pf ON pfa.PRODUCT_FEATURE_ID = pf.PRODUCT_FEATURE_ID 
+                  WHERE p.DISABLE='N'
+                  AND (p.PRODUCT_CATEGORY_ID='$category' OR p.NAME LIKE '%$category%')
+                  AND NOT EXISTS (
+                      SELECT 1 FROM product_assoc pa 
+                      WHERE pa.PRODUCT_ID_TO = p.PRODUCT_ID
+                  )";
         $result = mysqli_query($conn, $query);
 
         if ($result) {
@@ -47,12 +46,6 @@ function fetchProductJson($category) {
                 }
             }
 
-
-        // Convert array to JSON
-        // $json_data = json_encode($products, JSON_PRETTY_PRINT);
-        // echo $json_data;
-
-            // Convert array to JSON
             return $products;
         } else {
             echo "Error fetching data: " . mysqli_error($conn);
@@ -60,12 +53,11 @@ function fetchProductJson($category) {
         mysqli_close($conn);
     }
 
-    function fetchRelatedProducts($conn, $mainID)
-    {
+    function fetchRelatedProducts($conn, $mainID) {
         // Fetch main product data
         $query = "SELECT pa.PRODUCT_ID_TO as RELATED_ID FROM product p
-        LEFT JOIN product_assoc pa ON p.PRODUCT_ID = pa.PRODUCT_ID
-        WHERE p.PRODUCT_ID='$mainID'";
+                  LEFT JOIN product_assoc pa ON p.PRODUCT_ID = pa.PRODUCT_ID
+                  WHERE p.PRODUCT_ID='$mainID'";
 
         $result = mysqli_query($conn, $query);
 
@@ -79,11 +71,11 @@ function fetchProductJson($category) {
             // Output the related product IDs
             $related_product_data = array();
             foreach ($related_products as $related_product) {
-                $relatedProductQuery = "SELECT p.PRODUCT_ID,p.IMAGE,p.PRICE,p.NAME, pf.*
-            FROM product AS p
-            LEFT JOIN product_feature_appl pfa ON pfa.PRODUCT_ID = p.PRODUCT_ID
-            LEFT JOIN product_feature pf ON pf.PRODUCT_FEATURE_ID = pfa.PRODUCT_FEATURE_ID
-            WHERE pfa.PRODUCT_ID = '$related_product'";
+                $relatedProductQuery = "SELECT p.PRODUCT_ID, p.IMAGE, p.PRICE, p.NAME, pf.*
+                                        FROM product AS p
+                                        LEFT JOIN product_feature_appl pfa ON pfa.PRODUCT_ID = p.PRODUCT_ID
+                                        LEFT JOIN product_feature pf ON pf.PRODUCT_FEATURE_ID = pfa.PRODUCT_FEATURE_ID
+                                        WHERE pfa.PRODUCT_ID = '$related_product'";
 
                 $relatedResult = mysqli_query($conn, $relatedProductQuery);
                 if ($relatedResult) {
@@ -95,7 +87,7 @@ function fetchProductJson($category) {
                             "PRICE" => $relatedRow['PRODUCT_PRICE'],
                             "PRODUCT_FEATURE_TYPE" => $relatedRow['PRODUCT_FEATURE_TYPE'],
                         );
-                
+
                         if ($relatedRow['PRODUCT_FEATURE_TYPE'] == 'COLOR') {
                             $related_product_data[count($related_product_data) - 1]["PRODUCT_NAME"] = $relatedRow['NAME'];
                             $related_product_data[count($related_product_data) - 1]["PRODUCT_IMAGE"] = $relatedRow['IMAGE'];
@@ -107,7 +99,6 @@ function fetchProductJson($category) {
                 } else {
                     echo "Error fetching related product data: " . mysqli_error($conn);
                 }
-                
             }
 
             return $related_product_data; // Return the related product data array
@@ -116,9 +107,8 @@ function fetchProductJson($category) {
         }
     }
 
-
-    return fetchProducts($conn,$category);
+    return fetchProducts($conn, $category);
 }
-//usage
+// Usage
 // fetchProductJson("category name");
 ?>
