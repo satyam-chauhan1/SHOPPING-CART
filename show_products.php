@@ -40,6 +40,19 @@ if ($jsonData !== null) {
     <div class="border-top border-bottom" style="margin-top: 8%; margin-bottom: 2%;">
         <h6 class="text-center p-2 text-success">PRODUCTS</h6>
     </div>
+
+    <!-- Add to Cart
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link text-dark" href="cart.php">
+                <i class="fa fa-cart-plus"></i> Cart
+                <span id="cart-count" class="badge badge-pill badge-dark">0</span>
+            </a>
+        </li>
+    </ul> -->
+
+
+
     <div class="container mt-3">
         <div class="row">
             <?php
@@ -187,9 +200,30 @@ if ($jsonData !== null) {
 
                 // Log the cart JSON string to the console
                 console.log(cartJson);
+
+                // Send the updated cart to the server
+                $.ajax({
+                    url: 'update_cart.php',
+                    method: 'POST',
+                    data: {
+                        cart: cartJson
+                    },
+                    success: function(response) {
+                        console.log(response);
+                    }
+                });
+
+                // Update cart count
+                updateCartCount();
             });
+
+            function updateCartCount() {
+                var cartCount = cart.length;
+                $('#cart-count').text(cartCount);
+            }
         });
     </script>
+
 
     <style>
         .selected-size {

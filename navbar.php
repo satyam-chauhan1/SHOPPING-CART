@@ -64,13 +64,14 @@
                 </li>
             </ul>
 
-
-            <!-- Add to Cart -->
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="cart.php"><i class="fa fa-cart-plus"></i> Cart</a>
-                </li>
-            </ul>
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link text-light" href="cart.php">
+                <i class="fa fa-cart-plus"></i> Cart
+                <span id="cart-count" class="badge badge-pill badge-light">0</span>
+            </a>
+        </li>
+    </ul>
         </div>
     </nav>
 
