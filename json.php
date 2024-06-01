@@ -46,6 +46,10 @@ function fetchProductJson($category) {
                 }
             }
 
+            // Convert array to JSON
+            // $json_data = json_encode($products, JSON_PRETTY_PRINT);
+            // echo $json_data;
+
             return $products;
         } else {
             echo "Error fetching data: " . mysqli_error($conn);
@@ -61,7 +65,7 @@ function fetchProductJson($category) {
 
         $result = mysqli_query($conn, $query);
 
-        if ($result) {  
+        if ($result) {
             $related_products = array();
             while ($row = mysqli_fetch_assoc($result)) {
                 // Store fetched data in $related_products array

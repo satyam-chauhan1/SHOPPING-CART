@@ -93,7 +93,7 @@ if ($jsonData !== null) {
 
                                             ?>
 
-                                            <a class="color-link" href="#" data-name="<?php echo $relatedProduct['PRODUCT_NAME']; ?>" data-color="<?php echo $relatedProduct['COLOR']; ?>" data-image="<?php echo $relatedProduct['PRODUCT_IMAGE']; ?>" data-sizes='<?php echo json_encode($outputArray); ?>' data-product-id="<?php echo $product['MAIN_PRODUCT_ID']; ?>">
+                                            <a class="color-link" href="#" data-name="<?php echo $relatedProduct['PRODUCT_NAME']; ?>" data-color="<?php echo $relatedProduct['COLOR']; ?>" data-image="<?php echo $relatedProduct['PRODUCT_IMAGE']; ?>" data-sizes='<?php echo json_encode($outputArray); ?>' data-price="<?php echo $relatedProduct['PRICE']; ?>" data-product-id="<?php echo $product['MAIN_PRODUCT_ID']; ?>">
                                                 <div class="rounded-circle p-2 mx-auto mb-2 border" style="width: 25px; height: 25px; background-color: <?php echo $relatedProduct['COLOR']; ?>"></div>
                                             </a>
                                         </div>
@@ -106,7 +106,7 @@ if ($jsonData !== null) {
                                 <!-- Sizes will be displayed here when a color is clicked -->
                             </div>
                             <!-- Add to Cart button placeholder -->
-                            <div id="add-to-cart-<?php echo $product['MAIN_PRODUCT_ID']; ?>" class="text-center mt-2">
+                            <div id="add-to-cart-<?php echo $product['MAIN_PRODUCT_ID']; ?>" class="text-center mt-2 ">
                                 <!-- Add to Cart button will be displayed here when a size is clicked -->
                             </div>
                         </div>
@@ -119,8 +119,9 @@ if ($jsonData !== null) {
             ?>
         </div>
     </div>
-
     <script>
+        var cart = []; // Global cart array
+
         $(document).ready(function() {
             $('.color-link').click(function(e) {
                 e.preventDefault();
@@ -128,47 +129,64 @@ if ($jsonData !== null) {
                 var newName = $(this).data('name');
                 var sizes = $(this).data('sizes');
                 var productId = $(this).data('product-id');
-                // console.log(imageSrc)
-                // console.log(newName)
-                // console.log(sizes)
-                // console.log(productId)
+                var color = $(this).data('color');
 
-                // Update main product image
                 $('.main-image-' + productId).attr('src', imageSrc);
-
-                // Update main product name
                 $('.main-name-' + productId).text(newName);
 
-                // Update main product sizes
                 var sizesDiv = $('#sizes-' + productId);
-                sizesDiv.empty(); // Clear the existing sizes
+                sizesDiv.empty();
 
                 $.each(sizes, function(size, price) {
-                    sizesDiv.append('<div class="d-inline-block rounded-circle border ml-2 mb-2 size-link" style="width: 25px; height: 25px; cursor: pointer;" data-price="' + price + '" data-product-id="' + productId + '">' + size + '</div>');
+                    sizesDiv.append('<div class="d-inline-block rounded-circle border ml-2 mb-2 size-link" style="width: 25px; height: 25px; cursor: pointer;" data-price="' + price + '" data-product-id="' + productId + '" data-size="' + size + '" data-color="' + color + '">' + size + '</div>');
                 });
 
-                // Update price for the main product
                 $('#main-price-' + productId + ' .price-value').text($(this).data('price'));
             });
 
-            // Handle size click events
             $(document).on('click', '.size-link', function() {
                 var newPrice = $(this).data('price');
                 var productId = $(this).data('product-id');
+                var size = $(this).data('size');
+                var color = $(this).data('color');
 
-                // Update the price display
                 $('#main-price-' + productId + ' .price-value').text(newPrice);
 
-                // Remove the 'selected-size' class from all size links within the same product
                 $('#sizes-' + productId + ' .size-link').removeClass('selected-size');
-
-                // Add the 'selected-size' class to the clicked size link
                 $(this).addClass('selected-size');
 
-                // Add to Cart button logic
                 var addToCartDiv = $('#add-to-cart-' + productId);
-                addToCartDiv.empty(); // Clear any existing button
-                addToCartDiv.append('<button class="btn rounded-pill mb-2 text-white small" style="background-color: #6c757d;">Add to Cart</button>');
+                addToCartDiv.empty();
+                addToCartDiv.append('<button class="btn rounded-pill mb-2 text-white small add-to-cart-btn" style="background-color: #6c757d;" data-product-id="' + productId + '" data-size="' + size + '" data-name="' + $('.main-name-' + productId).text() + '" data-image="' + $('.main-image-' + productId).attr('src') + '" data-price="' + newPrice + '" data-color="' + color + '">Add to Cart</button>');
+            });
+
+            $(document).on('click', '.add-to-cart-btn', function(e) {
+                e.preventDefault();
+                var productId = $(this).data('product-id');
+                var name = $(this).data('name');
+                var image = $(this).data('image');
+                var size = $(this).data('size');
+                var price = $(this).data('price');
+                var color = $(this).data('color');
+
+                // Create an object with the data
+                var productData = {
+                    product_id: productId,
+                    name: name,
+                    image: image,
+                    size: size,
+                    price: price,
+                    color: color // Include color in the data sent to the server
+                };
+
+                // Add product to cart array
+                cart.push(productData);
+
+                // Convert the cart array to a JSON string
+                var cartJson = JSON.stringify(cart);
+
+                // Log the cart JSON string to the console
+                console.log(cartJson);
             });
         });
     </script>
@@ -176,9 +194,7 @@ if ($jsonData !== null) {
     <style>
         .selected-size {
             background-color: #6c757d;
-            /* Change this color to your preferred selection color */
             color: #fff;
-            /* Change text color */
         }
     </style>
 
