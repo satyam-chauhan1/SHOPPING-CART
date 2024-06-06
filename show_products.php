@@ -38,20 +38,8 @@ if ($jsonData !== null) {
 <body class="bg-light">
 
     <div class="border-top border-bottom" style="margin-top: 8%; margin-bottom: 2%;">
-        <h6 class="text-center p-2 text-success">PRODUCTS</h6>
+        <h4 class="text-center p-2">PRODUCTS</h4>
     </div>
-
-    <!-- Add to Cart
-    <ul class="navbar-nav">
-        <li class="nav-item">
-            <a class="nav-link text-dark" href="cart.php">
-                <i class="fa fa-cart-plus"></i> Cart
-                <span id="cart-count" class="badge badge-pill badge-dark">0</span>
-            </a>
-        </li>
-    </ul> -->
-
-
 
     <div class="container mt-3">
         <div class="row">
@@ -175,6 +163,16 @@ if ($jsonData !== null) {
 
             $(document).on('click', '.add-to-cart-btn', function(e) {
                 e.preventDefault();
+
+                // Check if the user is logged in
+                if (!<?php echo isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true ? 'true' : 'false'; ?>) {
+                    // User is not logged in, show alert
+                    alert("You need to login to add products to your cart.");
+                    // Redirect to login page
+                    window.location.href = "login_page.php";
+                    return; // Stop further execution
+                }
+
                 var productId = $(this).data('product-id');
                 var name = $(this).data('name');
                 var image = $(this).data('image');
@@ -182,18 +180,26 @@ if ($jsonData !== null) {
                 var price = $(this).data('price');
                 var color = $(this).data('color');
 
-                // Create an object with the data
-                var productData = {
-                    product_id: productId,
-                    name: name,
-                    image: image,
-                    size: size,
-                    price: price,
-                    color: color // Include color in the data sent to the server
-                };
+                // Check if the product already exists in the cart
+                var existingProduct = cart.find(function(item) {
+                    return item.product_id === productId && item.size === size && item.color === color;
+                });
 
-                // Add product to cart array
-                cart.push(productData);
+                if (existingProduct) {
+                    // Increment the quantity if the product already exists
+                    existingProduct.quantity++;
+                } else {
+                    // Add a new entry to the cart if the product doesn't exist
+                    cart.push({
+                        product_id: productId,
+                        name: name,
+                        image: image,
+                        size: size,
+                        price: price,
+                        color: color,
+                        quantity: 1 // Initialize quantity to 1
+                    });
+                }
 
                 // Convert the cart array to a JSON string
                 var cartJson = JSON.stringify(cart);
@@ -218,9 +224,14 @@ if ($jsonData !== null) {
             });
 
             function updateCartCount() {
-                var cartCount = cart.length;
+                var cartCount = 0;
+                // Calculate total quantity in the cart
+                cart.forEach(function(item) {
+                    cartCount += item.quantity;
+                });
                 $('#cart-count').text(cartCount);
             }
+
         });
     </script>
 

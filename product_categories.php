@@ -22,6 +22,10 @@ require 'db_connect.php';
 
 <body class="bg-light">
 
+    <div class="border-top border-bottom" style="margin-top: 8%; ">
+        <h4 class="text-center p-2 ">PRODUCT CATEGORIES</h4>
+    </div>
+
     <?php require 'navbar.php'; ?>
     <div class="container">
 
@@ -44,7 +48,7 @@ require 'db_connect.php';
             <div class="row">
                 <?php while ($product = mysqli_fetch_array($result)) { ?>
 
-                    <div class="col-md-4 mt-5">
+                    <div class="col-md-4 mt-3">
                         <div class="border bg-white">
 
                             <img src="<?php echo $product['IMAGE']; ?>" alt="shoes" class="img-fluid">

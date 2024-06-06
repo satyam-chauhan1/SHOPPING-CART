@@ -64,14 +64,18 @@
                 </li>
             </ul>
 
-    <ul class="navbar-nav">
-        <li class="nav-item">
-            <a class="nav-link text-light" href="cart.php">
-                <i class="fa fa-cart-plus"></i> Cart
-                <span id="cart-count" class="badge badge-pill badge-light">0</span>
-            </a>
-        </li>
-    </ul>
+            <!-- Add to cart  -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="cart.php">
+                        <i class="fa fa-cart-plus"></i> Cart
+                        <span id="cart-count" class="badge badge-pill badge-light">
+                            <?php echo isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?>
+                        </span>
+
+                    </a>
+                </li>
+            </ul>
         </div>
     </nav>
 

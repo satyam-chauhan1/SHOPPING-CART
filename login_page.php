@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             session_start();
             $_SESSION['loggedin'] = true;
             $_SESSION['phoneNumber'] = $phoneNumber;
-            header("location:show_products.php?for=");
+            header("location:product_categories.php?id=");
         } else {
             echo '<div class="alert alert-danger">
        <strong>Error!</strong>Please enter a valid username and password.
@@ -105,6 +105,7 @@ mysqli_close($conn);
         </form>
     </div>
 
+    <!-- for show password  -->
     <script>
         function togglePasswordVisibility() {
             var passwordField = document.getElementById("password");
