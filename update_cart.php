@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ) {
                         // Item already in cart, increment quantity and update price
                         $existingItem['quantity'] += 1;
-                        $existingItem['price'] += $newItem['price'];
+                        // $existingItem['price'] += $newItem['price'];
                         $itemFound = true;
                         break;
                     }

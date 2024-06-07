@@ -58,20 +58,22 @@
                     if (!$loggedin) {
                         echo '<a class="nav-link text-white" href="login_page.php"><i class="fa fa-user"></i> Login</a>';
                     } else {
-                        echo '<a class="nav-link text-white" href="logout.php"><i class="fa fa-user"></i> Logout</a>';
+                        $firstName = isset($_SESSION['firstName']) ? $_SESSION['firstName'] : 'User';
+                        echo '<a class="nav-link text-white bg-success rounded mr-2" href="logout.php"><i class="fa fa-user"></i> ' . htmlspecialchars($firstName) . ' || <i class="fa fa-sign-out"></i> Logout</a>';
                     }
                     ?>
                 </li>
             </ul>
+
 
             <!-- Add to cart  -->
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link text-light" href="cart.php">
                         <i class="fa fa-cart-plus"></i> Cart
-                        <span id="cart-count" class="badge badge-pill badge-light">
-                            <?php echo isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?>
-                        </span>
+                        <span id="cart-count" class="badge badge-pill badge-light">0 </span>
+                        <!-- <?php echo isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?> -->
+
 
                     </a>
                 </li>

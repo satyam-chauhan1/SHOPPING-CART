@@ -31,6 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             session_start();
             $_SESSION['loggedin'] = true;
             $_SESSION['phoneNumber'] = $phoneNumber;
+            $_SESSION['firstName'] = $row['FIRST_NAME'];
             header("location:product_categories.php?id=");
         } else {
             echo '<div class="alert alert-danger">

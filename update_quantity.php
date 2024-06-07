@@ -9,10 +9,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_SESSION['cart'][$index])) {
             if ($action === 'increase') {
                 $_SESSION['cart'][$index]['quantity'] += 1;
-                $_SESSION['cart'][$index]['price'] += $_SESSION['cart'][$index]['price'] / ($_SESSION['cart'][$index]['quantity'] - 1);
+                // $_SESSION['cart'][$index]['price'] += $_SESSION['cart'][$index]['price'] / ($_SESSION['cart'][$index]['quantity'] - 1);
             } elseif ($action === 'decrease' && $_SESSION['cart'][$index]['quantity'] > 1) {
                 $_SESSION['cart'][$index]['quantity'] -= 1;
-                $_SESSION['cart'][$index]['price'] -= $_SESSION['cart'][$index]['price'] / ($_SESSION['cart'][$index]['quantity'] + 1);
+                // $_SESSION['cart'][$index]['price'] -= $_SESSION['cart'][$index]['price'] / ($_SESSION['cart'][$index]['quantity'] + 1);
             }
             echo "Quantity updated successfully";
         } else {
