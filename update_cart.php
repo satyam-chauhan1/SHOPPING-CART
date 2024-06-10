@@ -17,24 +17,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $itemFound = false;
             // Process each item in the new cart array
-                foreach ($_SESSION['cart'] as &$existingItem) {
-                    if (
-                        $existingItem['product_id'] === $cartJson['product_id'] &&
-                        $existingItem['size'] === $cartJson['size'] &&
-                        $existingItem['color'] === $cartJson['color']
-
-                    ) {
-                        // Item already in cart, increment quantity and update price
-                        $existingItem['quantity'] = $existingItem['quantity']+ 1;
-                        $itemFound = true;
-                        break;
-                    }
-                    }
+            foreach ($_SESSION['cart'] as &$existingItem) {
+                if (
+                    $existingItem['product_id'] === $cartJson['product_id'] &&
+                    $existingItem['size'] === $cartJson['size'] &&
+                    $existingItem['color'] === $cartJson['color']
+                ) {
+                    // Item already in cart, increment quantity and update price
+                    $existingItem['quantity'] = $existingItem['quantity'] + 1;
+                    $itemFound = true;
+                    break;
+                }
+            }
             if (!$itemFound) {
                 $cartJson['quantity'] = 1;
                 $_SESSION['cart'][] = $cartJson;
             }
-
 
             // echo "\nCart updated successfully";
         } else {
@@ -52,6 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             echo "Item not found in cart";
         }
+    } elseif (isset($_POST['action']) && $_POST['action'] === 'clear') {
+        // Clear the cart
+        unset($_SESSION['cart']);
+        echo json_encode(['status' => 'success']);
     } else {
         echo "No cart data received";
     }

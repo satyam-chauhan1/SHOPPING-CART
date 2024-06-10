@@ -173,22 +173,22 @@
                                 <input type="password" class="form-control" id="cvv" placeholder="CVV">
                             </div>
                         </div>
-                        <button type="button" class="btn btn-success btn-block pay_btn">Pay</button>
+                        <!-- <button type="button" class="btn btn-success btn-block pay_btn">Pay</button> -->
                     </div>
-                    
-                     <!-- UPI detail  -->
-                     <div id="upiDetails" style="display: none;">
-                            <div class="form-group">
-                                <label for="upiId">UPI ID</label>
-                                <input type="text" class="form-control" id="upiId" placeholder="Enter UPI ID">
-                            </div>
+
+                    <!-- UPI detail  -->
+                    <div id="upiDetails" style="display: none;">
+                        <div class="form-group">
+                            <label for="upiId">UPI ID</label>
+                            <input type="text" class="form-control" id="upiId" placeholder="Enter UPI ID">
                         </div>
+                    </div>
                 </div>
 
                 <!-- modal buttons  -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Confirm Purchase</button>
+                    <button type="button" class="btn btn-primary" id="confirmPucrhase">Confirm Purchase</button>
                 </div>
             </div>
         </div>
@@ -242,10 +242,11 @@
             // });
             // show card details
             $('input[name="paymentMethod"]').change(function() {
-                if ($(this).val() === 'debit-card') {
+                var selectedMethod = $(this).val();
+                if (selectedMethod === 'debit-card') {
                     $('#cardDetails').show();
                     $('#upiDetails').hide();
-                } else if ($(this).val() === 'upi') {
+                } else if (selectedMethod === 'upi') {
                     $('#cardDetails').hide();
                     $('#upiDetails').show();
                 } else {
@@ -316,9 +317,69 @@
             // $('.update-quantity, .remove-from-cart').click(function() {
             //     updateCartCount();
             // });
-            $('#placeOrderButton').click(function () {
-                alert('Order placed successfully!');
-                $('#checkoutModal').modal('hide');
+
+
+            $('#confirmPucrhase').click(function() {
+                var selectedMethod = $('input[name="paymentMethod"]:checked').val();
+
+                if (!selectedMethod) {
+                    alert('Please select a payment method.');
+                    return;
+                }
+
+                if (selectedMethod === 'debit-card') {
+                    var cardNumber = $('#cardNumber').val().trim();
+                    var expiryDate = $('#expiryDate').val().trim();
+                    var cvv = $('#cvv').val().trim();
+
+                    if (cardNumber === "" || expiryDate === "" || cvv === "") {
+                        alert('Please fill out all debit card details.');
+                        return;
+                    }
+
+                    if (!/^\d{16}$/.test(cardNumber)) {
+                        alert('Card number should be 16 digits.');
+                        return;
+                    }
+
+                    if (!/^\d{3}$/.test(cvv)) {
+                        alert('CVV should be 3 digits.');
+                        return;
+                    }
+
+                    // Additional validation for expiry date can be added if necessary
+                }
+
+                if (selectedMethod === 'upi') {
+                    var upiId = $('#upiId').val().trim();
+
+                    if (upiId === "") {
+                        alert('Please fill out UPI ID.');
+                        return;
+                    }
+
+                    if (!/^\w+@\w+$/.test(upiId)) {
+                        alert('Please enter a valid UPI ID.(This format- abcd@123)');
+                        return;
+                    }
+                }
+
+
+                // Proceed with order confirmation and cart clearing
+                $.ajax({
+                    url: 'update_cart.php',
+                    method: 'POST',
+                    data: {
+                        action: 'clear'
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        alert('This order placed successfully! Continue shopping....');
+                        $('#checkoutModal').modal('hide');
+                        window.location.href = 'show_products.php?for=';
+                    }
+                });
+
             });
 
         });
