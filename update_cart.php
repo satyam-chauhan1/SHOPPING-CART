@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cartJson = $_POST['cart'];
 
         // Decode the JSON string to ensure it's valid
-        $cartArray = json_decode($cartJson, true);
+        $cartJson = json_decode($cartJson, true);
 
         if (json_last_error() === JSON_ERROR_NONE) {
             // Check if cart session exists
@@ -15,31 +15,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['cart'] = [];
             }
 
+            $itemFound = false;
             // Process each item in the new cart array
-            foreach ($cartArray as $newItem) {
-                $itemFound = false;
                 foreach ($_SESSION['cart'] as &$existingItem) {
                     if (
-                        $existingItem['product_id'] === $newItem['product_id'] &&
-                        $existingItem['size'] === $newItem['size'] &&
-                        $existingItem['color'] === $newItem['color']
+                        $existingItem['product_id'] === $cartJson['product_id'] &&
+                        $existingItem['size'] === $cartJson['size'] &&
+                        $existingItem['color'] === $cartJson['color']
+
                     ) {
                         // Item already in cart, increment quantity and update price
-                        $existingItem['quantity'] += 1;
-                        // $existingItem['price'] += $newItem['price'];
+                        $existingItem['quantity'] = $existingItem['quantity']+ 1;
                         $itemFound = true;
                         break;
                     }
-                }
-
-                if (!$itemFound) {
-                    // If item not found, add it to the cart with quantity 1
-                    $newItem['quantity'] = 1;
-                    $_SESSION['cart'][] = $newItem;
-                }
+                    }
+            if (!$itemFound) {
+                $cartJson['quantity'] = 1;
+                $_SESSION['cart'][] = $cartJson;
             }
 
-            echo "Cart updated successfully";
+
+            // echo "\nCart updated successfully";
         } else {
             echo "Invalid JSON data";
         }

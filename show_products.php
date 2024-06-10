@@ -180,17 +180,19 @@ if ($jsonData !== null) {
                 var price = $(this).data('price');
                 var color = $(this).data('color');
 
+                var cartJson = {}
                 // Check if the product already exists in the cart
                 var existingProduct = cart.find(function(item) {
                     return item.product_id === productId && item.size === size && item.color === color;
                 });
-
+                // console.log("Existing product: ", existingProduct);
                 if (existingProduct) {
+                    cartJson = JSON.stringify(existingProduct);
                     // Increment the quantity if the product already exists
-                    existingProduct.quantity++;
+                    // existingProduct.quantity++;
                 } else {
                     // Add a new entry to the cart if the product doesn't exist
-                    cart.push({
+                    existingProduct = {
                         product_id: productId,
                         name: name,
                         image: image,
@@ -198,14 +200,15 @@ if ($jsonData !== null) {
                         price: price,
                         color: color,
                         quantity: 1 // Initialize quantity to 1
-                    });
+                    };
+                    cartJson = JSON.stringify(existingProduct);
                 }
 
                 // Convert the cart array to a JSON string
-                var cartJson = JSON.stringify(cart);
+                
 
                 // Log the cart JSON string to the console
-                console.log(cartJson);
+                // console.log(cartJson);
 
                 // Send the updated cart to the server
                 $.ajax({

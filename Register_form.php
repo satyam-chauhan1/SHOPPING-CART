@@ -9,15 +9,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $phone_number = $_POST['phoneNumber'];
     // $password = $_POST['password'];
     $password = trim($_POST['password']);
-    $address = $_POST['address'];
+    $address1 = $_POST['address1'];
+    $landMark = $_POST['landMark'];
+    $house_no = $_POST['houseNo'];
+    $district = $_POST['district'];
+    $pin_code = $_POST['pinCode'];
+    $state = $_POST['state'];
 
     // Hash the password
     $hashed_password = password_hash($password, PASSWORD_ARGON2ID);
     // echo "Hash Password : " . $hashed_password ."<br>";
 
     // Insert data into the register_form table
-    $sql = "INSERT INTO register_form(FIRST_NAME,LAST_NAME,PHONE,PASSWORD,ADDRESS) 
-            VALUES ('$first_name', '$last_name', '$phone_number', '$hashed_password', '$address')";
+    $sql = "INSERT INTO register_form(FIRST_NAME,LAST_NAME,PHONE,PASSWORD,ADDRESS_1,LANDMARK,HOUSE_NO,DISTRICT,PIN_CODE,STATE) 
+            VALUES ('$first_name', '$last_name', '$phone_number', '$hashed_password', '$address1', '$landMark','$house_no', '$district' ,'$pin_code', '$state')";
 
     if (mysqli_query($conn, $sql)) {
         echo '<div class="alert alert-success">
@@ -61,7 +66,7 @@ mysqli_close($conn);
             <h3 class="text-center">SIGN UP</h3>
             <p class="text-center">Please fill in the information below</p>
             <div class="form-group">
-                <input type="text" class="form-control p-4" id="firstName" name="firstName" placeholder="First name">
+                <input type="text" class="form-control p-4" id="firstName" name="firstName" placeholder="First name*">
                 <?php
                 if ($firstNameRequired == true) {
                     echo '<span style="color:red;">First name is required*</span>';
@@ -70,7 +75,7 @@ mysqli_close($conn);
             </div>
 
             <div class="form-group">
-                <input type="text" class="form-control p-4" id="lastName" name="lastName" placeholder="Last name">
+                <input type="text" class="form-control p-4" id="lastName" name="lastName" placeholder="Last name*">
                 <?php
                 if ($lastNameRequired == true) {
                     echo '<span style="color:red;">Last name is required*</span>';
@@ -79,7 +84,7 @@ mysqli_close($conn);
             </div>
 
             <div class="form-group">
-                <input type="text" class="form-control p-4" id="phoneNumber" name="phoneNumber" placeholder="Phone">
+                <input type="text" class="form-control p-4" id="phoneNumber" name="phoneNumber" placeholder="Phone*">
                 <?php
                 if ($phoneNumberRequired == true) {
                     echo '<span style="color:red;">phone number is required*</span>';
@@ -92,7 +97,7 @@ mysqli_close($conn);
             </div>
 
             <div class="input-group">
-                <input type="password" class="form-control p-4" id="password" name="password" placeholder="Password">
+                <input type="password" class="form-control p-4" id="password" name="password" placeholder="Password*">
                 <div class="input-group-prepend" onclick="togglePasswordVisibility()">
                     <span class="input-group-text"><i id="toggleIcon" class="fa fa-eye-slash"></i></span>
                 </div>
@@ -105,20 +110,73 @@ mysqli_close($conn);
 
 
             <div class="form-group mt-3">
-                <input type="text" class="form-control p-4" id="address" name="address" placeholder="Address">
+                <input type="text" class="form-control p-4" id="address1" name="address1" placeholder="Address*">
                 <?php
-                if ($addressRequired == true) {
+                if ($address1Required == true) {
                     echo '<span style="color:red;">Address is required*</span>';
                 }
                 ?>
             </div>
 
-            <button type="submit" class="bg-dark btn-block text-center rounded-pill text-white mt-4">
-                <h5>CREATE ACCOUNT</h5>
-            </button>
-            <p class="text-center mt-2 text-secondary">Already have an account?
-                <a href="login_page.php">Login</a>
-            </p>
+            <div class="form-group mt-3">
+                <input type="text" class="form-control p-4" id="landMark" name="landMark" placeholder="Landmark*">
+                <?php
+                if ($landMarkRequired == true) {
+                    echo '<span style="color:red;">Lamdmark field is required*</span>';
+                }
+                ?>
+            </div>
+            <div class="row">
+                <div class=" col form-group mt-3">
+                    <input type="text" class="form-control p-4" id="houseNo" name="houseNo" placeholder="House/Flat No.*">
+                    <?php
+                    if ($houseNoRequired == true) {
+                        echo '<span style="color:red;">House/Flat No. is required*</span>';
+                    }
+                    ?>
+                </div>
+                <div class=" col form-group mt-3">
+                    <input type="text" class="form-control p-4" id="district" name="district" placeholder="District*">
+                    <?php
+                    if ($districtRequired == true) {
+                        echo '<span style="color:red;">District Name is required*</span>';
+                    }
+                    ?>
+                </div>
+
+                <div class="row ml-2">
+                    <div class=" col form-group mt-3">
+                        <input type="text" class="form-control p-4" id="pinCode" name="pinCode" placeholder="Pin Code*">
+                        <?php
+                        if ($pinCodeRequired == true) {
+                            echo '<span style="color:red;">Pin Code is required*</span>';
+                        } else if ($pinCodeLength == true) {
+                            echo '<span style="color:red;">Enter a valid 6-digit phone number*</span>';
+                        } else if ($pinCodeNumeric == true) {
+                            echo '<span style="color:red;">Enter only numeric characters*</span>';
+                        }
+                        ?>
+                    </div>
+
+                    <div class=" col form-group mt-3">
+                        <input type="text" class="form-control p-4" id="state" name="state" placeholder="State*">
+                        <?php
+                        if ($stateRequired == true) {
+                            echo '<span style="color:red;">State Name is required*</span>';
+                        }
+                        ?>
+                    </div>
+
+
+                </div>
+
+
+                <button type="submit" class="bg-dark btn-block text-center rounded-pill text-white mt-4">
+                    <h5>CREATE ACCOUNT</h5>
+                </button>
+                <p class="text-center mt-2 text-secondary">Already have an account?
+                    <a href="login_page.php">Login</a>
+                </p>
 
         </form>
     </div>

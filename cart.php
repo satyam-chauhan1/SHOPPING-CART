@@ -38,7 +38,6 @@
                         <tr>
                             <th class="align-middle text-center">Image</th>
                             <th class="align-middle text-center">Product Name</th>
-                            <!-- <th class="align-middle text-center">Size</th> -->
                             <th class="align-middle text-center">Colour</th>
                             <th class="align-middle text-center">Price</th>
                             <th class="align-middle text-center">Quantity</th>
@@ -55,33 +54,27 @@
                                 $totalPrice += $item['price'] * $item['quantity'];
                                 $totalQuantity += $item['quantity'];
                         ?>
+                                <!-- product image  -->
                                 <tr id="cart-item-<?php echo $index; ?>">
-                                    <!-- image  -->
                                     <td class="align-middle text-center">
                                         <img src="<?php echo $item['image']; ?>" alt="Product Image">
                                     </td>
 
-                                    <!-- name  -->
+                                    <!-- name,size -->
                                     <td class="align-middle">
                                         <div><?php echo $item['name']; ?></div>
                                         <div class="mt-2"> <strong class="font-italic">Size:</strong> <?php echo $item['size']; ?></div>
                                     </td>
 
-
-                                    <!-- size  -->
-                                    <!-- <td class="align-middle text-center">
-                                        <?php echo $item['size']; ?>
-                                    </td> -->
-
                                     <!-- colour  -->
                                     <td class="align-middle text-center">
-                                        <div class="rounded-circle  mx-auto " style="width: 20px; height: 20px; background-color: <?php echo $item['color']; ?>;"></div>
+                                        <div class="rounded-circle mx-auto" style="width: 20px; height: 20px; background-color: <?php echo $item['color']; ?>;"></div>
                                     </td>
 
-                                    <!--per unit price  -->
+                                    <!-- price  -->
                                     <td class="align-middle text-center">&#8377; <?php echo number_format($item['price'], 2); ?></td>
 
-                                    <!-- quantity -->
+                                    <!-- quantity  -->
                                     <td class="align-middle text-center">
                                         <div class="quantity-input d-flex align-items-center justify-content-center">
                                             <button class="btn update-quantity" data-index="<?php echo $index; ?>" data-action="decrease">
@@ -94,11 +87,8 @@
                                         </div>
                                     </td>
 
-
-                                    <!--total price  -->
+                                    <!-- total price  -->
                                     <td class="align-middle text-center">&#8377; <?php echo number_format($item['price'] * $item['quantity'], 2); ?></td>
-
-                                    <!-- remove from cart -->
                                     <td class="align-middle text-center text-danger remove-from-cart" style="font-size: 1.2em;" data-index="<?php echo $index; ?>">
                                         <i class="fa fa-trash"></i>
                                     </td>
@@ -106,12 +96,12 @@
                             <?php
                             }
                             ?>
-                            <!--grand total -->
-                            <tr>
-                                <td colspan="5" class="text-right font-weight-bold font-italic">Grand Total(item <?php echo $totalQuantity; ?>) :</td>
-                                <td colspan="4" class=" font-weight-bold">&#8377; <?php echo number_format($totalPrice, 2); ?></td>
-                            </tr>
 
+                            <!-- grand total  -->
+                            <tr>
+                                <td colspan="5" class="text-right font-weight-bold font-italic">Grand Total (items: <?php echo $totalQuantity; ?>) :</td>
+                                <td colspan="4" class="font-weight-bold">&#8377; <?php echo number_format($totalPrice, 2); ?></td>
+                            </tr>
                         <?php
                         } else {
                             echo '<tr><td colspan="6" class="text-center"><h4>Your cart is empty.<h4></td></tr>';
@@ -119,6 +109,8 @@
                         ?>
                     </tbody>
                 </table>
+
+                <!-- buttons  -->
                 <?php if (!empty($_SESSION['cart'])) { ?>
                     <div class="row ">
                         <div class="col-6">
@@ -126,17 +118,15 @@
                         </div>
 
                         <div class="col-6 text-right mb-3">
-                            <a href="#" class="text-decoration-none text-white p-2 small rounded bg-danger" data-toggle="modal" data-target="#checkoutModal">PROCEED TO BUY <i class="fa fa-long-arrow-right"></i></a>
+                            <button class="text-decoration-none text-white p-2 small rounded bg-danger proceed_buy" data-toggle="modal" data-target="#checkoutModal">PROCEED TO BUY <i class="fa fa-long-arrow-right"></i></button>
                         </div>
-
-
                     </div>
                 <?php } ?>
             </div>
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- modal  -->
     <div class="modal fade" id="checkoutModal" tabindex="-1" role="dialog" aria-labelledby="checkoutModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -150,16 +140,52 @@
                     <p><strong class="font-italic">Total Quantity:</strong> <?php echo $totalQuantity; ?></p>
                     <p><strong class="font-italic">Total Price:</strong> &#8377; <?php echo number_format($totalPrice, 2); ?></p>
                     <div class="form-group">
-                        <label for="paymentMethod">Payment Method</label>
-                        <select class="form-control" id="paymentMethod">
-                            <option>Credit Card</option>
-                            <option>Debit Card</option>
-                            <option>Net Banking</option>
-                            <option>UPI</option>
-                            <option>Cash on Delivery</option>
-                        </select>
+                        <label class="font-weight-bold">Payment Method</label>
+                        <div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="debitCard" value="debit-card">
+                                <label class="form-check-label" for="debitCard">Debit Card</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="upi" value="upi">
+                                <label class="form-check-label" for="upi">UPI</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod">
+                                <label class="form-check-label" for="cod">Cash on Delivery</label>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- debit cart detail  -->
+                    <div id="cardDetails" style="display: none;">
+                        <div class="form-group">
+                            <label for="cardNumber">Card Number</label>
+                            <input type="text" class="form-control" id="cardNumber" placeholder="Enter card number">
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="expiryDate">Expiry Date</label>
+                                <input type="text" class="form-control" id="expiryDate" placeholder="MM/YY">
+                            </div>
+                            <div class="col">
+                                <label for="cvv">CVV</label>
+                                <input type="password" class="form-control" id="cvv" placeholder="CVV">
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-success btn-block pay_btn">Pay</button>
+                    </div>
+                    
+                     <!-- UPI detail  -->
+                     <div id="upiDetails" style="display: none;">
+                            <div class="form-group">
+                                <label for="upiId">UPI ID</label>
+                                <input type="text" class="form-control" id="upiId" placeholder="Enter UPI ID">
+                            </div>
+                        </div>
                 </div>
+
+                <!-- modal buttons  -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary">Confirm Purchase</button>
@@ -170,7 +196,7 @@
 
     <script>
         $(document).ready(function() {
-            $('.update-quantity').click(function() {
+            $('.update-quantity').on("click", function() {
                 var index = $(this).data('index');
                 var action = $(this).data('action');
 
@@ -206,10 +232,95 @@
                 });
             });
 
+            // $('input[name="paymentMethod"]').change(function() {
+            //     var selectedMethod = $(this).val();
+            //     if (selectedMethod === 'debit-card') {
+            //         $('#cardDetails').show();
+            //     } else {
+            //         $('#cardDetails').hide();
+            //     }
+            // });
+            // show card details
+            $('input[name="paymentMethod"]').change(function() {
+                if ($(this).val() === 'debit-card') {
+                    $('#cardDetails').show();
+                    $('#upiDetails').hide();
+                } else if ($(this).val() === 'upi') {
+                    $('#cardDetails').hide();
+                    $('#upiDetails').show();
+                } else {
+                    $('#cardDetails').hide();
+                    $('#upiDetails').hide();
+                }
+            });
+
+            $('.pay_btn').click(function() {
+                var cardNo = document.getElementById('cardNumber');
+                var numberRegex = /^\d+$/;
+
+                if (cardNo.value === "") {
+                    // Do nothing if card number is empty
+                } else if (!numberRegex.test(cardNo.value)) {
+                    alert("Only numbers are allowed in card number");
+                    return false;
+                } else {
+                    var length = cardNo.value.length;
+                    if (length !== 16) {
+                        alert("Card number should be 16 digits");
+                    }
+                }
+            });
+
+            // json
+            $('.proceed_buy').click(function() {
+                var cartItems = <?php echo json_encode($_SESSION['cart']); ?>;
+                var totalQuantity = <?php echo $totalQuantity; ?>;
+                var totalPrice = <?php echo $totalPrice; ?>;
+                var cartJson = JSON.stringify({
+                    items: cartItems,
+                    totalQuantity: totalQuantity,
+                    totalPrice: totalPrice
+                });
+                console.log(cartJson);
+            });
+
+            // count product total quantity 
+            function calculateTotalQuantity() {
+                var totalQuantity = 0;
+                $('.quantity-input input').each(function() {
+                    totalQuantity += parseInt($(this).val());
+                });
+                return totalQuantity;
+            }
+
+            // Function to update product quantity in navbar
             function updateCartCount() {
-                var cartCount = <?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0; ?>;
+                var cartCount = calculateTotalQuantity();
                 $('#cart-count').text(cartCount);
             }
+
+            // Call updateCartCount function on page load
+            updateCartCount();
+
+
+            //  product quantity 
+            // function updateCartCount() {
+            //     var cartCount = <?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0; ?>;
+            //     $('#cart-count').text(cartCount);
+            // }
+
+            // // Call updateCartCount function on page load
+            // updateCartCount();
+
+            // // Call updateCartCount function whenever a product is added or removed
+            // $('.update-quantity, .remove-from-cart').click(function() {
+            //     updateCartCount();
+            // });
+            $('#placeOrderButton').click(function () {
+                alert('Order placed successfully!');
+                $('#checkoutModal').modal('hide');
+            });
+
         });
     </script>
 </body>
