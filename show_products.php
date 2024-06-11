@@ -204,7 +204,6 @@ if ($jsonData !== null) {
                     cartJson = JSON.stringify(existingProduct);
                 }
 
-                // Convert the cart array to a JSON string
                 
 
                 // Log the cart JSON string to the console

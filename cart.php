@@ -24,7 +24,10 @@
 </head>
 
 <body class="bg-light">
-    <?php require 'navbar.php'; ?>
+    <?php
+    require 'navbar.php';
+    require 'address.php';
+    ?>
 
     <div class="container mt-3">
         <div class="" style="margin-top: 9%; margin-bottom: 2%;">
@@ -140,6 +143,13 @@
                     <p><strong class="font-italic">Total Quantity:</strong> <?php echo $totalQuantity; ?></p>
                     <p><strong class="font-italic">Total Price:</strong> &#8377; <?php echo number_format($totalPrice, 2); ?></p>
                     <div class="form-group">
+                        <label class="font-weight-bold">Delivery Address</label>
+                        <div id="addressList">
+                            <!-- Addresses will be populated here by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label class="font-weight-bold">Payment Method</label>
                         <div>
                             <div class="form-check">
@@ -209,7 +219,7 @@
                     },
                     success: function(response) {
                         console.log(response);
-                        location.reload();
+                        // location.reload();
                     }
                 });
             });
@@ -232,14 +242,6 @@
                 });
             });
 
-            // $('input[name="paymentMethod"]').change(function() {
-            //     var selectedMethod = $(this).val();
-            //     if (selectedMethod === 'debit-card') {
-            //         $('#cardDetails').show();
-            //     } else {
-            //         $('#cardDetails').hide();
-            //     }
-            // });
             // show card details
             $('input[name="paymentMethod"]').change(function() {
                 var selectedMethod = $(this).val();
@@ -277,15 +279,17 @@
                 var cartItems = <?php echo json_encode($_SESSION['cart']); ?>;
                 var totalQuantity = <?php echo $totalQuantity; ?>;
                 var totalPrice = <?php echo $totalPrice; ?>;
+                var addresses = <?php echo json_encode($_SESSION['addresses']); ?>;
                 var cartJson = JSON.stringify({
                     items: cartItems,
                     totalQuantity: totalQuantity,
-                    totalPrice: totalPrice
+                    totalPrice: totalPrice,
+                    address: addresses
                 });
                 console.log(cartJson);
             });
 
-            // count product total quantity 
+            // count total product quantity 
             function calculateTotalQuantity() {
                 var totalQuantity = 0;
                 $('.quantity-input input').each(function() {
@@ -318,6 +322,21 @@
             //     updateCartCount();
             // });
 
+
+            // Populate addresses in the modal
+            var addresses = <?php echo json_encode($_SESSION['addresses']); ?>;
+            var addressListHtml = '';
+            addresses.forEach(function(address, index) {
+                addressListHtml += `
+            <div class="form-check address-item" id="addressItem${index}">
+                <input class="form-check-input" type="hidden" name="deliveryAddress" id="address${index}" value="${address}">
+                <label class="form-check-label" for="address${index}">
+                    ${address}
+                </label>
+            </div>
+        `;
+            });
+            $('#addressList').html(addressListHtml);
 
             $('#confirmPucrhase').click(function() {
                 var selectedMethod = $('input[name="paymentMethod"]:checked').val();
