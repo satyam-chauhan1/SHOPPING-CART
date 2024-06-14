@@ -66,6 +66,7 @@
                                     <!-- name,size -->
                                     <td class="align-middle">
                                         <div><?php echo $item['name']; ?></div>
+                                        <div><?php echo $item['product_id']; ?></div>
                                         <div class="mt-2"> <strong class="font-italic">Size:</strong> <?php echo $item['size']; ?></div>
                                     </td>
 
@@ -161,7 +162,7 @@
                                 <label class="form-check-label" for="upi">UPI</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="COD">
                                 <label class="form-check-label" for="cod">Cash on Delivery</label>
                             </div>
                         </div>
@@ -219,7 +220,7 @@
                     },
                     success: function(response) {
                         console.log(response);
-                        // location.reload();
+                        location.reload();
                     }
                 });
             });
@@ -287,7 +288,23 @@
                     address: addresses
                 });
                 console.log(cartJson);
+
+                $.ajax({
+                    url: 'store_cart_in_session.php', // Replace with your PHP script's path
+                    type: 'POST',
+                    data: {
+                        cartJson: cartJson
+                    },
+                    success: function(response) {
+                        console.log('cartJson stored in session successfully.');
+                        // Optionally, handle response if needed
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error storing cartJson in session:', error);
+                    }
+                });
             });
+
 
             // count total product quantity 
             function calculateTotalQuantity() {
@@ -384,18 +401,32 @@
                 }
 
 
-                // Proceed with order confirmation and cart clearing
+                //    Proceed with order confirmation
+                var totalQuantity = <?php echo $totalQuantity; ?>;
+                var totalPrice = <?php echo $totalPrice; ?>;
+                var address = <?php echo json_encode($_SESSION['addresses']); ?>;
+                var data = {
+                    totalQuantity: totalQuantity,
+                    totalPrice: totalPrice,
+                    address: address,
+                    paymentMethod: selectedMethod,
+                    action: 'confirm_purchase'
+                };
+                // console.log("Total Quantity:", totalQuantity);
+                // console.log("Total Price:",  totalPrice);
+                // console.log("Address:", address);
+                // console.log("Payment :", selectedMethod);
+
+
                 $.ajax({
-                    url: 'update_cart.php',
+                    url: 'place_order.php',
                     method: 'POST',
-                    data: {
-                        action: 'clear'
-                    },
+                    data: data,
                     success: function(response) {
                         console.log(response);
                         alert('This order placed successfully! Continue shopping....');
                         $('#checkoutModal').modal('hide');
-                        window.location.href = 'show_products.php?for=';
+                        // window.location.href = 'show_products.php?for=';
                     }
                 });
 
