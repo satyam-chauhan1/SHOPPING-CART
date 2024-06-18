@@ -35,8 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Sanitize the order adjustment ID to prevent SQL injection
                     $orderAdjustmentId = $conn->real_escape_string($orderAdjustmentId);
 
+                    $discountAmount = $_POST['discountAmount'];
+                    $discountPercentage = $_POST['discountPercentage'];
+                    $finalPrice = $_POST['finalPrice'];
+
                     // Construct the SQL query for order_adjustment
-                    $order_adjustment_sql = "INSERT INTO order_adjustment (ORDER_ADJUSTMENT_ID, ORDER_ID) VALUES ('$orderAdjustmentId', '$orderID')";
+                    $order_adjustment_sql = "INSERT INTO order_adjustment (ORDER_ADJUSTMENT_ID, ORDER_ID, AMOUNT, DESCRIPTION) 
+                                             VALUES ('$orderAdjustmentId', '$orderID','$discountAmount', 'Discount of $discountPercentage% on ₹$totalPrice is ₹$discountAmount')";
 
                     // Execute the query
                     if ($conn->query($order_adjustment_sql) === TRUE) {
@@ -61,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 echo "Error inserting order item $productId: " . $conn->error;
                             }
                         }
-                        
+
                         // Clear the cart
                         unset($_SESSION['cart']);
                     } else {

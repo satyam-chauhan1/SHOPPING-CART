@@ -52,10 +52,16 @@
                         <?php
                         $totalPrice = 0;
                         $totalQuantity = 0;
+                        $discountAmount = 0;
+                        $discountPercentage = 20; // Define the discount percentage here
+
                         if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
                             foreach ($_SESSION['cart'] as $index => $item) {
                                 $totalPrice += $item['price'] * $item['quantity'];
                                 $totalQuantity += $item['quantity'];
+
+                                $discountAmount = $totalPrice * ($discountPercentage / 100);
+                                $finalPrice = $totalPrice - $discountAmount;
                         ?>
                                 <!-- product image  -->
                                 <tr id="cart-item-<?php echo $index; ?>">
@@ -66,7 +72,7 @@
                                     <!-- name,size -->
                                     <td class="align-middle">
                                         <div><?php echo $item['name']; ?></div>
-                                        <div><?php echo $item['product_id']; ?></div>
+                                        <!-- <div><?php echo $item['product_id']; ?></div> -->
                                         <div class="mt-2"> <strong class="font-italic">Size:</strong> <?php echo $item['size']; ?></div>
                                     </td>
 
@@ -143,6 +149,9 @@
                 <div class="modal-body">
                     <p><strong class="font-italic">Total Quantity:</strong> <?php echo $totalQuantity; ?></p>
                     <p><strong class="font-italic">Total Price:</strong> &#8377; <?php echo number_format($totalPrice, 2); ?></p>
+                    <p><strong class="font-italic">Discount (<?php echo $discountPercentage; ?>%):</strong> &#8377; <?php echo number_format($discountAmount, 2); ?> </p>
+                    <p><strong class="font-italic">Final Price:</strong> &#8377; <?php echo number_format($finalPrice, 2); ?></p>
+
                     <div class="form-group">
                         <label class="font-weight-bold">Delivery Address</label>
                         <div id="addressList">
@@ -162,7 +171,7 @@
                                 <label class="form-check-label" for="upi">UPI</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="COD">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="COD" checked>
                                 <label class="form-check-label" for="cod">Cash on Delivery</label>
                             </div>
                         </div>
@@ -277,17 +286,24 @@
 
             // json
             $('.proceed_buy').click(function() {
-                var cartItems = <?php echo json_encode($_SESSION['cart']); ?>;
                 var totalQuantity = <?php echo $totalQuantity; ?>;
                 var totalPrice = <?php echo $totalPrice; ?>;
+                var discountPercentage = <?php echo $discountPercentage; ?>;
+                var discountAmount = <?php echo $discountAmount; ?>;
+                var finalPrice = <?php echo $finalPrice; ?>;;
+                var cartItems = <?php echo json_encode($_SESSION['cart']); ?>;
                 var addresses = <?php echo json_encode($_SESSION['addresses']); ?>;
+
                 var cartJson = JSON.stringify({
                     items: cartItems,
                     totalQuantity: totalQuantity,
                     totalPrice: totalPrice,
-                    address: addresses
+                    discountPercentage: discountPercentage,
+                    discountAmount: discountAmount,
+                    finalPrice: finalPrice,
+                    addresses: addresses
                 });
-                console.log(cartJson);
+                // console.log(cartJson);
 
                 $.ajax({
                     url: 'store_cart_in_session.php', // Replace with your PHP script's path
@@ -296,8 +312,7 @@
                         cartJson: cartJson
                     },
                     success: function(response) {
-                        console.log('cartJson stored in session successfully.');
-                        // Optionally, handle response if needed
+                        // console.log('cartJson stored in session successfully.');
                     },
                     error: function(xhr, status, error) {
                         console.error('Error storing cartJson in session:', error);
@@ -404,16 +419,25 @@
                 //    Proceed with order confirmation
                 var totalQuantity = <?php echo $totalQuantity; ?>;
                 var totalPrice = <?php echo $totalPrice; ?>;
+                var discountPercentage = <?php echo $discountPercentage; ?>;
+                var discountAmount = <?php echo $discountAmount; ?>;
+                var finalPrice = <?php echo $finalPrice; ?>;;
                 var address = <?php echo json_encode($_SESSION['addresses']); ?>;
                 var data = {
                     totalQuantity: totalQuantity,
                     totalPrice: totalPrice,
+                    discountPercentage: discountPercentage,
+                    discountAmount: discountAmount,
+                    finalPrice: finalPrice,
                     address: address,
                     paymentMethod: selectedMethod,
                     action: 'confirm_purchase'
                 };
                 // console.log("Total Quantity:", totalQuantity);
-                // console.log("Total Price:",  totalPrice);
+                // console.log("Total Price:", totalPrice);
+                // console.log("Discount Percentage:", discountPercentage);
+                // console.log("Discount Amount:", discountAmount);
+                // console.log("Final Price:", finalPrice);
                 // console.log("Address:", address);
                 // console.log("Payment :", selectedMethod);
 
@@ -426,7 +450,7 @@
                         console.log(response);
                         alert('This order placed successfully! Continue shopping....');
                         $('#checkoutModal').modal('hide');
-                        // window.location.href = 'show_products.php?for=';
+                        window.location.href = 'show_products.php?for=';
                     }
                 });
 
