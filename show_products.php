@@ -19,6 +19,9 @@ if ($jsonData !== null) {
     // Log the JSON data to the JavaScript console
     echo '<script>console.log(' . $encodedData . ');</script>';
 }
+
+// Close database connection
+mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -70,7 +73,7 @@ if ($jsonData !== null) {
                             <div class="text-center">
                                 <!-- main product color  -->
                                 <div class="d-inline-block mr-1">
-                                    <a class="color-link" href="#" data-color="<?php echo $product['MAIN_PRO_COLOR']; ?>" data-image="<?php echo $product['MAIN_PRO_IMAGE']; ?>" data-price="<?php echo $product['MAIN_PRO_PRICE']; ?>" data-name="<?php echo $product['MAIN_PRO_NAME']; ?>" data-sizes='<?php echo json_encode($product['MAIN_PRO_SIZES']); ?>' data-product-id="<?php echo $product['MAIN_PRODUCT_ID']; ?>">
+                                    <a class="color-link main-color-link" href="#" data-color="<?php echo $product['MAIN_PRO_COLOR']; ?>" data-image="<?php echo $product['MAIN_PRO_IMAGE']; ?>" data-price="<?php echo $product['MAIN_PRO_PRICE']; ?>" data-name="<?php echo $product['MAIN_PRO_NAME']; ?>" data-sizes='<?php echo json_encode($product['MAIN_PRO_SIZES']); ?>' data-main-product-id="<?php echo $product['MAIN_PRODUCT_ID']; ?>">
                                         <div class="rounded-circle p-2 mx-auto mb-2 border" style="width: 25px; height: 25px; background-color: <?php echo $product['MAIN_PRO_COLOR']; ?>"></div>
                                     </a>
                                 </div>
@@ -94,7 +97,7 @@ if ($jsonData !== null) {
 
                                             ?>
 
-                                            <a class="color-link" href="#" data-name="<?php echo $relatedProduct['PRODUCT_NAME']; ?>" data-color="<?php echo $relatedProduct['COLOR']; ?>" data-image="<?php echo $relatedProduct['PRODUCT_IMAGE']; ?>" data-sizes='<?php echo json_encode($outputArray); ?>' data-price="<?php echo $relatedProduct['PRICE']; ?>" data-product-id="<?php echo $product['MAIN_PRODUCT_ID']; ?>">
+                                            <a class="color-link related-color-link" href="#" data-name="<?php echo $relatedProduct['PRODUCT_NAME']; ?>" data-color="<?php echo $relatedProduct['COLOR']; ?>" data-image="<?php echo $relatedProduct['PRODUCT_IMAGE']; ?>" data-sizes='<?php echo json_encode($outputArray); ?>' data-price="<?php echo $relatedProduct['PRICE']; ?>" data-main-product-id="<?php echo $product['MAIN_PRODUCT_ID']; ?>" data-related-product-id="<?php echo $relatedProduct['RELATED_PRODUCT_ID']; ?>">
                                                 <div class="rounded-circle p-2 mx-auto mb-2 border" style="width: 25px; height: 25px; background-color: <?php echo $relatedProduct['COLOR']; ?>"></div>
                                             </a>
                                         </div>
@@ -122,43 +125,73 @@ if ($jsonData !== null) {
     </div>
     <script>
         var cart = []; // Global cart array
+        var productContext = ''; // Track whether the main or related product is clicked
 
         $(document).ready(function() {
-            $('.color-link').click(function(e) {
+            $('.main-color-link').click(function(e) {
                 e.preventDefault();
+                productContext = 'main'; // Set context to main product
+                var mainProductId = $(this).data('main-product-id');
+                // console.log("Main Product ID: " + mainProductId);
+
                 var imageSrc = $(this).data('image');
                 var newName = $(this).data('name');
                 var sizes = $(this).data('sizes');
-                var productId = $(this).data('product-id');
                 var color = $(this).data('color');
 
-                $('.main-image-' + productId).attr('src', imageSrc);
-                $('.main-name-' + productId).text(newName);
+                $('.main-image-' + mainProductId).attr('src', imageSrc);
+                $('.main-name-' + mainProductId).text(newName);
 
-                var sizesDiv = $('#sizes-' + productId);
+                var sizesDiv = $('#sizes-' + mainProductId);
                 sizesDiv.empty();
 
                 $.each(sizes, function(size, price) {
-                    sizesDiv.append('<div class="d-inline-block rounded-circle border ml-2 mb-2 size-link" style="width: 25px; height: 25px; cursor: pointer;" data-price="' + price + '" data-product-id="' + productId + '" data-size="' + size + '" data-color="' + color + '">' + size + '</div>');
+                    sizesDiv.append('<div class="d-inline-block rounded-circle border ml-2 mb-2 size-link" style="width: 25px; height: 25px; cursor: pointer;" data-price="' + price + '" data-main-product-id="' + mainProductId + '" data-size="' + size + '" data-color="' + color + '">' + size + '</div>');
                 });
 
-                $('#main-price-' + productId + ' .price-value').text($(this).data('price'));
+                $('#main-price-' + mainProductId + ' .price-value').text($(this).data('price'));
+            });
+
+            $('.related-color-link').click(function(e) {
+                e.preventDefault();
+                productContext = 'related'; // Set context to related product
+                var relatedProductId = $(this).data('related-product-id');
+                // console.log("Related Product ID: " + relatedProductId);
+
+                var imageSrc = $(this).data('image');
+                var newName = $(this).data('name');
+                var sizes = $(this).data('sizes');
+                var mainProductId = $(this).data('main-product-id');
+                var color = $(this).data('color');
+
+                $('.main-image-' + mainProductId).attr('src', imageSrc);
+                $('.main-name-' + mainProductId).text(newName);
+
+                var sizesDiv = $('#sizes-' + mainProductId);
+                sizesDiv.empty();
+
+                $.each(sizes, function(size, price) {
+                    sizesDiv.append('<div class="d-inline-block rounded-circle border ml-2 mb-2 size-link" style="width: 25px; height: 25px; cursor: pointer;" data-price="' + price + '" data-main-product-id="' + mainProductId + '" data-related-product-id="' + relatedProductId + '" data-size="' + size + '" data-color="' + color + '">' + size + '</div>');
+                });
+
+                $('#main-price-' + mainProductId + ' .price-value').text($(this).data('price'));
             });
 
             $(document).on('click', '.size-link', function() {
                 var newPrice = $(this).data('price');
-                var productId = $(this).data('product-id');
+                var mainProductId = $(this).data('main-product-id');
+                var relatedProductId = $(this).data('related-product-id');
                 var size = $(this).data('size');
                 var color = $(this).data('color');
 
-                $('#main-price-' + productId + ' .price-value').text(newPrice);
+                $('#main-price-' + mainProductId + ' .price-value').text(newPrice);
 
-                $('#sizes-' + productId + ' .size-link').removeClass('selected-size');
+                $('#sizes-' + mainProductId + ' .size-link').removeClass('selected-size');
                 $(this).addClass('selected-size');
 
-                var addToCartDiv = $('#add-to-cart-' + productId);
+                var addToCartDiv = $('#add-to-cart-' + mainProductId);
                 addToCartDiv.empty();
-                addToCartDiv.append('<button class="btn rounded-pill mb-2 text-white small add-to-cart-btn" style="background-color: #6c757d;" data-product-id="' + productId + '" data-size="' + size + '" data-name="' + $('.main-name-' + productId).text() + '" data-image="' + $('.main-image-' + productId).attr('src') + '" data-price="' + newPrice + '" data-color="' + color + '">Add to Cart</button>');
+                addToCartDiv.append('<button class="btn rounded-pill mb-2 text-white small add-to-cart-btn" style="background-color: #6c757d;" data-main-product-id="' + mainProductId + '" data-related-product-id="' + relatedProductId + '" data-size="' + size + '" data-name="' + $('.main-name-' + mainProductId).text() + '" data-image="' + $('.main-image-' + mainProductId).attr('src') + '" data-price="' + newPrice + '" data-color="' + color + '">Add to Cart</button>');
             });
 
             $(document).on('click', '.add-to-cart-btn', function(e) {
@@ -173,27 +206,26 @@ if ($jsonData !== null) {
                     return; // Stop further execution
                 }
 
-                var productId = $(this).data('product-id');
+                var mainProductId = $(this).data('main-product-id');
+                var relatedProductId = $(this).data('related-product-id');
                 var name = $(this).data('name');
                 var image = $(this).data('image');
                 var size = $(this).data('size');
                 var price = $(this).data('price');
                 var color = $(this).data('color');
 
-                var cartJson = {}
+                var cartJson = {};
                 // Check if the product already exists in the cart
                 var existingProduct = cart.find(function(item) {
-                    return item.product_id === productId && item.size === size && item.color === color;
+                    return item.main_product_id === mainProductId && item.related_product_id === relatedProductId && item.size === size && item.color === color;
                 });
                 // console.log("Existing product: ", existingProduct);
+
                 if (existingProduct) {
                     cartJson = JSON.stringify(existingProduct);
-                    // Increment the quantity if the product already exists
-                    // existingProduct.quantity++;
                 } else {
                     // Add a new entry to the cart if the product doesn't exist
                     existingProduct = {
-                        product_id: productId,
                         name: name,
                         image: image,
                         size: size,
@@ -201,10 +233,17 @@ if ($jsonData !== null) {
                         color: color,
                         quantity: 1 // Initialize quantity to 1
                     };
-                    cartJson = JSON.stringify(existingProduct);
-                }
 
-                
+                    // Add the appropriate product ID based on the context
+                    if (productContext === 'main') {
+                        existingProduct.main_product_id = mainProductId;
+                    } else if (productContext === 'related') {
+                        existingProduct.related_product_id = relatedProductId;
+                    }
+
+                    cartJson = JSON.stringify(existingProduct);
+                    cart.push(existingProduct);
+                }
 
                 // Log the cart JSON string to the console
                 // console.log(cartJson);
@@ -217,7 +256,7 @@ if ($jsonData !== null) {
                         cart: cartJson
                     },
                     success: function(response) {
-                        console.log(response);
+                        // console.log(response);
                     }
                 });
 

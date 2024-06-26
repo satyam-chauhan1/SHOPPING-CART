@@ -22,9 +22,6 @@ require 'db_connect.php';
 
 <body class="bg-light">
 
-    <?php require 'navbar.php'; ?>
-
-
     <!-- carousel  -->
     <div id="carouselExampleIndicators" class="carousel slide bg-dark" data-ride="carousel">
         <ol class="carousel-indicators">
@@ -63,17 +60,46 @@ require 'db_connect.php';
         </a>
     </div>
 
-    <!-- OUR FOOTWEAR COLLECTION -->
+    <!-- Top selling products  -->
     <div class="col p-5">
-        <h2 class="text-center">SHOP BY CATEGORY</h2>
+        <h2 class="text-center border-top border-bottom p-2">OUR TOP SELLING PRODUCTS</h2>
     </div>
 
-    <div class="row">
-        <div class="col-lg-4 col-md-6 bg white">
+    <?php
+    require 'navbar.php'; 
+    require 'top_selling_products.php';
 
-
+    // Display top selling products from session
+    if (isset($_SESSION['topSellingProducts']) && !empty($_SESSION['topSellingProducts'])) {
+        $topSellingProducts = $_SESSION['topSellingProducts'];
+    ?>
+        <div class="col-md-12">
+            <div class="row">
+                <?php
+                // Loop through top selling products to display
+                foreach ($topSellingProducts as $product) {
+                ?>
+                    <div class="col-md-4 mb-3">
+                        <div class="product border bg-white p-1">
+                            <img class="img-fluid" src="<?php echo $product['IMAGE']; ?>" alt="Product Image">
+                            <hr>
+                            <p class="text-center text-dark my-2 ml-2 small" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"><?php echo $product['NAME']; ?></p>
+                            <!-- <p>Color: <?php echo $product['COLOR']; ?></p> -->
+                            <!-- <p class="text-center">Total Quantity Sold: <?php echo $product['total_quantity']; ?></p> -->
+                        </div>
+                    </div>
+                <?php
+                }
+                ?>
+            </div>
         </div>
-    </div>
+    <?php
+    } else {
+        echo '<div class="col-md-12"><p class="text-center">No top selling products available.</p></div>';
+    }
+    ?>
+
+
 
 
 </body>

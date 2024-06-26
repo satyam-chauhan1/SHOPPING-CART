@@ -37,7 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     $discountAmount = $_POST['discountAmount'];
                     $discountPercentage = $_POST['discountPercentage'];
-                    $finalPrice = $_POST['finalPrice'];
 
                     // Construct the SQL query for order_adjustment
                     $order_adjustment_sql = "INSERT INTO order_adjustment (ORDER_ADJUSTMENT_ID, ORDER_ID, AMOUNT, DESCRIPTION) 
@@ -45,30 +44,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     // Execute the query
                     if ($conn->query($order_adjustment_sql) === TRUE) {
-                        // echo "Order Adjustment ID $orderAdjustmentId inserted successfully.";
 
                         // Insert each item in the cart into the order_item table
                         $items = $cartJson['items'];
+
+                        // Define the starting sequence ID
+                        $seqId = 1;
                         foreach ($items as $item) {
-                            $productId = $conn->real_escape_string($item['product_id']);
+                            $mainProductId = isset($item['main_product_id']) ? $conn->real_escape_string($item['main_product_id']) : null;
+                            $relatedProductId = isset($item['related_product_id']) ? $conn->real_escape_string($item['related_product_id']) : null;
+                            $productId = !empty($mainProductId) ? $mainProductId : $relatedProductId;
+
 
                             $quantity = $conn->real_escape_string($item['quantity']);
                             $price = $conn->real_escape_string($item['price']);
-                            $seqId = generateUniqueId($conn, "SEQ_ID", "order_item", "SEQUENCE_ID"); // Generate sequence ID
 
+                            $sequenceId = "SEQ_ID00" . $seqId;
 
-                            $order_item_sql = "INSERT INTO order_item (PRODUCT_ID,SEQUENCE_ID,QUANTITY,UNIT_PRICE,IS_PROMO,CHANGE_BY_USER_LOGIN_ID) 
-                                               VALUES ('$productId','$seqId','$quantity','$price','Y','$userLoginId')";
+                            $order_item_sql = "INSERT INTO order_item (ORDER_ID,PRODUCT_ID,SEQUENCE_ID,QUANTITY,UNIT_PRICE,IS_PROMO,CHANGE_BY_USER_LOGIN_ID) 
+                                               VALUES ('$orderID','$productId','$sequenceId','$quantity','$price','Y','$userLoginId')";
 
                             if ($conn->query($order_item_sql) === TRUE) {
-                                echo "Order Item $productId inserted successfully with SEQ_ID $seqId.";
+                                echo "Order Item $orderID inserted successfully with SEQ_ID $sequenceId.";
                             } else {
-                                echo "Error inserting order item $productId: " . $conn->error;
+                                echo "Error inserting order item $orderID: " . $conn->error;
                             }
+                            // Increment seqId for the next item
+                            $seqId++;
                         }
 
                         // Clear the cart
                         unset($_SESSION['cart']);
+                        unset($_SESSION['cartJson']);
                     } else {
                         // echo "Error inserting order adjustment ID: " . $conn->error;
                     }

@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cartJson = $_POST['cart'];
 
         // Decode the JSON string to ensure it's valid
-        $cartJson = json_decode($cartJson, true);
+        $cartData = json_decode($cartJson, true);
 
         if (json_last_error() === JSON_ERROR_NONE) {
             // Check if cart session exists
@@ -16,12 +16,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $itemFound = false;
+            // Determine whether it's for main product or related product
+            $productId = isset($cartData['main_product_id']) ? $cartData['main_product_id'] : $cartData['related_product_id'];
+
             // Process each item in the new cart array
             foreach ($_SESSION['cart'] as &$existingItem) {
                 if (
-                    $existingItem['product_id'] === $cartJson['product_id'] &&
-                    $existingItem['size'] === $cartJson['size'] &&
-                    $existingItem['color'] === $cartJson['color']
+                    // $existingItem['main_product_id'] === $cartData['main_product_id'] &&
+                    // $existingItem['related_product_id'] === $cartData['related_product_id'] &&
+                    $existingItem['size'] === $cartData['size'] &&
+                    $existingItem['color'] === $cartData['color']
                 ) {
                     // Item already in cart, increment quantity and update price
                     $existingItem['quantity'] = $existingItem['quantity'] + 1;
@@ -30,8 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             if (!$itemFound) {
-                $cartJson['quantity'] = 1;
-                $_SESSION['cart'][] = $cartJson;
+                $cartData['quantity'] = 1;
+                $_SESSION['cart'][] = $cartData;
             }
 
             // echo "\nCart updated successfully";

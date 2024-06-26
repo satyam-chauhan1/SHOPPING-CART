@@ -290,7 +290,7 @@
                 var totalPrice = <?php echo $totalPrice; ?>;
                 var discountPercentage = <?php echo $discountPercentage; ?>;
                 var discountAmount = <?php echo $discountAmount; ?>;
-                var finalPrice = <?php echo $finalPrice; ?>;;
+                var finalPrice = <?php echo $finalPrice; ?>;
                 var cartItems = <?php echo json_encode($_SESSION['cart']); ?>;
                 var addresses = <?php echo json_encode($_SESSION['addresses']); ?>;
 
@@ -303,7 +303,7 @@
                     finalPrice: finalPrice,
                     addresses: addresses
                 });
-                // console.log(cartJson);
+                console.log(cartJson);
 
                 $.ajax({
                     url: 'store_cart_in_session.php', // Replace with your PHP script's path
@@ -421,7 +421,7 @@
                 var totalPrice = <?php echo $totalPrice; ?>;
                 var discountPercentage = <?php echo $discountPercentage; ?>;
                 var discountAmount = <?php echo $discountAmount; ?>;
-                var finalPrice = <?php echo $finalPrice; ?>;;
+                var finalPrice = <?php echo $finalPrice; ?>;
                 var address = <?php echo json_encode($_SESSION['addresses']); ?>;
                 var data = {
                     totalQuantity: totalQuantity,
