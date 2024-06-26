@@ -36,6 +36,21 @@ mysqli_close($conn);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>Show products</title>
+
+    <style>
+        .hover-zoom {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hover-zoom img {
+            transition: transform 0.3s ease;
+        }
+
+        .hover-zoom:hover img {
+            transform: scale(1.1);
+        }
+    </style>
 </head>
 
 <body class="bg-light">
@@ -53,9 +68,13 @@ mysqli_close($conn);
             ?>
                     <div class="col-md-4 mt-3 mb-3" id="<?php echo $product['MAIN_PRODUCT_ID']; ?>">
                         <div class="border bg-white p-1">
+                            <!-- <p class="bg-danger text-white col-lg-3 col-md-5 small"> 20% OFF</p> -->
 
                             <!-- product image  -->
-                            <img src="<?php echo $product['MAIN_PRO_IMAGE']; ?>" alt="shoes" class="img-fluid border-bottom main-image-<?php echo $product['MAIN_PRODUCT_ID']; ?>">
+                            <div class="hover-zoom">
+                                <img src="<?php echo $product['MAIN_PRO_IMAGE']; ?>" alt="shoes" class="img-fluid border-bottom main-image-<?php echo $product['MAIN_PRODUCT_ID']; ?>">
+
+                            </div>
 
                             <!-- product name  -->
                             <a class="text-decoration-none" href="#">

@@ -18,6 +18,21 @@ require 'db_connect.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>shopping_cart</title>
 
+    <style>
+        .hover-zoom {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hover-zoom img {
+            transition: transform 0.3s ease;
+        }
+
+        .hover-zoom:hover img {
+            transform: scale(1.1);
+        }
+    </style>
+
 </head>
 
 <body class="bg-light">
@@ -66,7 +81,7 @@ require 'db_connect.php';
     </div>
 
     <?php
-    require 'navbar.php'; 
+    require 'navbar.php';
     require 'top_selling_products.php';
 
     // Display top selling products from session
@@ -80,7 +95,7 @@ require 'db_connect.php';
                 foreach ($topSellingProducts as $product) {
                 ?>
                     <div class="col-md-4 mb-3">
-                        <div class="product border bg-white p-1">
+                        <div class="product border bg-white p-1 hover-zoom">
                             <img class="img-fluid" src="<?php echo $product['IMAGE']; ?>" alt="Product Image">
                             <hr>
                             <p class="text-center text-dark my-2 ml-2 small" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"><?php echo $product['NAME']; ?></p>
