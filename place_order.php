@@ -10,7 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $totalPrice = $_POST['totalPrice'];
         $paymentMethod = $_POST['paymentMethod'];
         // Order details
-        $orderDate = date('Y-m-d H:i:s');
+        $orderDateTime = date('Y-m-d H:i:s');
+        $orderDate = date('Y-m-d');
         $statusId = 'ORDER COMPLETED';
         $currency = 'INR';
         $createdBy = $userLoginId;
@@ -22,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $orderID = $conn->real_escape_string($orderID);
 
             // Construct the SQL query for order_header
-            $order_header_sql = "INSERT INTO order_header (ORDER_ID, ORDER_DATE, STATUS_ID, CREATED_BY, PAYMENT_METHOD, CURRENCY, REMAINING_SUB_TOTAL, GRAND_TOTAL) 
-                  VALUES ('$orderID', '$orderDate', '$statusId', '$createdBy', '$paymentMethod', '$currency', '$totalPrice', '$totalPrice')";
+            $order_header_sql = "INSERT INTO order_header (ORDER_ID, ORDER_DATE, STATUS_ID, CREATED_BY, DATE,PAYMENT_METHOD, CURRENCY, REMAINING_SUB_TOTAL, GRAND_TOTAL) 
+                  VALUES ('$orderID', '$orderDateTime', '$statusId', '$createdBy','$orderDate', '$paymentMethod', '$currency', '$totalPrice', '$totalPrice')";
             // Execute the query
             if ($conn->query($order_header_sql) === TRUE) {
                 // echo "Order ID $orderID inserted successfully.";

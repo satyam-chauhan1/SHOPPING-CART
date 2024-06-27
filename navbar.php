@@ -28,6 +28,8 @@
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
                     <a class="nav-link text-white" href="show_products.php?for=">All PRODUCTS</a>
+
+                    <a class="text-decoration-none text-white ml-2 " href="order_history.php">MY ORDERS</a>
                 </li>
 
                 <li class="nav-item active">
