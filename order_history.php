@@ -75,7 +75,6 @@ if (isset($_SESSION['phoneNumber'])) {
                 echo '</div>';
                 echo '<div class="mt-3">';
                 echo '<a href="show_products.php?product_id=' . $order['PRODUCT_ID'] . '" class="btn btn-warning btn-sm"><i class="fa fa-refresh" aria-hidden="true"></i> Buy again</a>';
-                echo '<a href="bill.php" class="btn btn-warning btn-sm ml-3"> Get invoice</a>';
                 echo '</div>';
                 echo '</div>';
             }

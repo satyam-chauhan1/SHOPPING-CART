@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $first_name = $_POST['firstName'];
     $last_name = $_POST['lastName'];
     $phone_number = $_POST['phoneNumber'];
-    // $password = $_POST['password'];
+    $email = $_POST['emailId'];
     $password = trim($_POST['password']);
     $address1 = $_POST['address1'];
     $landMark = $_POST['landMark'];
@@ -21,8 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // echo "Hash Password : " . $hashed_password ."<br>";
 
     // Insert data into the register_form table
-    $sql = "INSERT INTO register_form(FIRST_NAME,LAST_NAME,PHONE,PASSWORD,ADDRESS_1,LANDMARK,HOUSE_NO,DISTRICT,PIN_CODE,STATE) 
-            VALUES ('$first_name', '$last_name', '$phone_number', '$hashed_password', '$address1', '$landMark','$house_no', '$district' ,'$pin_code', '$state')";
+    $sql = "INSERT INTO register_form(FIRST_NAME,LAST_NAME,PHONE,EMAIL,PASSWORD,ADDRESS_1,LANDMARK,HOUSE_NO,DISTRICT,PIN_CODE,STATE) 
+            VALUES ('$first_name', '$last_name', '$phone_number','$email', '$hashed_password', '$address1', '$landMark','$house_no', '$district' ,'$pin_code', '$state')";
 
     if (mysqli_query($conn, $sql)) {
         echo '<div class="alert alert-success">
@@ -96,6 +96,11 @@ mysqli_close($conn);
                 ?>
             </div>
 
+            <div class="form-group">
+            <input type="text" class="form-control p-4" id="emailId" name="emailId" placeholder="Email Id*">
+
+            </div>
+
             <div class="input-group">
                 <input type="password" class="form-control p-4" id="password" name="password" placeholder="Password*">
                 <div class="input-group-prepend" onclick="togglePasswordVisibility()">
@@ -110,7 +115,7 @@ mysqli_close($conn);
 
 
             <div class="form-group mt-3">
-                <input type="text" class="form-control p-4" id="address1" name="address1" placeholder="Address*">
+                <input type="text" class="form-control p-4" id="address1" name="address1" placeholder="Address1*">
                 <?php
                 if ($address1Required == true) {
                     echo '<span style="color:red;">Address is required*</span>';
@@ -119,7 +124,7 @@ mysqli_close($conn);
             </div>
 
             <div class="form-group mt-3">
-                <input type="text" class="form-control p-4" id="landMark" name="landMark" placeholder="Landmark*">
+                <input type="text" class="form-control p-4" id="landMark" name="landMark" placeholder="Address2*">
                 <?php
                 if ($landMarkRequired == true) {
                     echo '<span style="color:red;">Lamdmark field is required*</span>';
