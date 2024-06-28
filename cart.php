@@ -339,22 +339,6 @@
             // Call updateCartCount function on page load
             updateCartCount();
 
-
-            //  product quantity 
-            // function updateCartCount() {
-            //     var cartCount = <?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0; ?>;
-            //     $('#cart-count').text(cartCount);
-            // }
-
-            // // Call updateCartCount function on page load
-            // updateCartCount();
-
-            // // Call updateCartCount function whenever a product is added or removed
-            // $('.update-quantity, .remove-from-cart').click(function() {
-            //     updateCartCount();
-            // });
-
-
             // Populate addresses in the modal
             var addresses = <?php echo json_encode($_SESSION['addresses']); ?>;
             var addressListHtml = '';

@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $totalPrice = $_POST['totalPrice'];
         $paymentMethod = $_POST['paymentMethod'];
         // Order details
+        date_default_timezone_set('Asia/Kolkata');
         $orderDateTime = date('Y-m-d H:i:s');
         $orderDate = date('Y-m-d');
         $statusId = 'ORDER COMPLETED';
