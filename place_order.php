@@ -63,8 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                             $sequenceId = "SEQ_ID00" . $seqId;
 
-                            $order_item_sql = "INSERT INTO order_item (ORDER_ID,PRODUCT_ID,SEQUENCE_ID,QUANTITY,UNIT_PRICE,IS_PROMO,CHANGE_BY_USER_LOGIN_ID) 
-                                               VALUES ('$orderID','$productId','$sequenceId','$quantity','$price','Y','$userLoginId')";
+                            $order_item_sql = "INSERT INTO order_item (ORDER_ID,PRODUCT_ID,SEQUENCE_ID,QUANTITY,UNIT_PRICE,IS_PROMO,CHANGE_BY_USER_LOGIN_ID,ITEM_ORDER_DATETIME) 
+                                               VALUES ('$orderID','$productId','$sequenceId','$quantity','$price','Y','$userLoginId','$orderDateTime')";
 
                             if ($conn->query($order_item_sql) === TRUE) {
                                 echo "Order Item $orderID inserted successfully with SEQ_ID $sequenceId.";
