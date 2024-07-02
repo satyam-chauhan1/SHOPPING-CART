@@ -5,17 +5,29 @@ require 'navbar.php';
 
 if (isset($_SESSION['phoneNumber'])) {
     $userLoginId = $_SESSION['phoneNumber'];
-    $days = isset($_GET['days']) ? intval($_GET['days']) : 1; // Default to 1 day if not set
+    $days = isset($_GET['days']) ? $_GET['days'] : 'all'; 
 
-    // Modified query to include the total product count
-    $query = "SELECT oi.*, oh.ORDER_DATE, oh.GRAND_TOTAL, p.NAME, p.IMAGE, (oi.QUANTITY * oi.UNIT_PRICE) AS TOTAL_PRICE, 
-                     SUM(oi.QUANTITY) OVER() AS TOTAL_PRODUCT_COUNT
-              FROM order_item oi 
-              JOIN product p ON oi.PRODUCT_ID = p.PRODUCT_ID
-              JOIN order_header oh ON oi.ORDER_ID = oh.ORDER_ID
-              WHERE oi.CHANGE_BY_USER_LOGIN_ID = '$userLoginId'
-              AND oh.ORDER_DATE >= DATE_SUB(CURDATE(), INTERVAL $days DAY)
-              ORDER BY oi.ORDER_ID DESC";
+    //  value of $days
+    if ($days === 'all') {
+        $query = "SELECT oi.*, oh.ORDER_DATE, oh.GRAND_TOTAL, p.NAME, p.IMAGE, (oi.QUANTITY * oi.UNIT_PRICE) AS TOTAL_PRICE, 
+                         SUM(oi.QUANTITY) OVER() AS TOTAL_PRODUCT_COUNT
+                  FROM order_item oi 
+                  JOIN product p ON oi.PRODUCT_ID = p.PRODUCT_ID
+                  JOIN order_header oh ON oi.ORDER_ID = oh.ORDER_ID
+                  WHERE oi.CHANGE_BY_USER_LOGIN_ID = '$userLoginId'
+                  ORDER BY oi.ORDER_ID DESC";
+    } else {
+        $days = intval($days); //  $days is an integer
+        $query = "SELECT oi.*, oh.ORDER_DATE, oh.GRAND_TOTAL, p.NAME, p.IMAGE, (oi.QUANTITY * oi.UNIT_PRICE) AS TOTAL_PRICE, 
+                         SUM(oi.QUANTITY) OVER() AS TOTAL_PRODUCT_COUNT
+                  FROM order_item oi 
+                  JOIN product p ON oi.PRODUCT_ID = p.PRODUCT_ID
+                  JOIN order_header oh ON oi.ORDER_ID = oh.ORDER_ID
+                  WHERE oi.CHANGE_BY_USER_LOGIN_ID = '$userLoginId'
+                  AND oh.ORDER_DATE >= DATE_SUB(CURDATE(), INTERVAL $days DAY)
+                  ORDER BY oi.ORDER_ID DESC";
+    }
+
     $result = mysqli_query($conn, $query);
 
     if ($result) {
@@ -59,7 +71,7 @@ if (isset($_SESSION['phoneNumber'])) {
         <h4 class="text-center p-2">Order History</h4>
     </div>
     <!-- Order History Section -->
-    <div class="container ">
+    <div class="container">
         <form method="get" class="mb-4 text-right">
             <select name="days" id="days" class="custom-select w-auto" onchange="this.form.submit()">
                 <option>Back days history</option>
@@ -67,6 +79,7 @@ if (isset($_SESSION['phoneNumber'])) {
                 <option value="7">1 week</option>
                 <option value="30">1 month</option>
                 <option value="365">1 year</option>
+                <option value="all">All times</option>
             </select>
         </form>
 

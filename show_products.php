@@ -144,7 +144,7 @@ mysqli_close($conn);
     </div>
     <script>
         var cart = []; // Global cart array
-        var productContext = ''; // Track whether the main or related product is clicked
+        var productContext = ''; //  main or related product is clicked
 
         $(document).ready(function() {
             $('.main-color-link').click(function(e) {
@@ -265,7 +265,7 @@ mysqli_close($conn);
                 }
 
                 // Log the cart JSON string to the console
-                // console.log(cartJson);
+                console.log(cartJson);
 
                 // Send the updated cart to the server
                 $.ajax({
