@@ -1,13 +1,19 @@
 <?php
-
 require 'db_connect.php';
 require 'navbar.php';
 
 if (isset($_SESSION['phoneNumber'])) {
     $userLoginId = $_SESSION['phoneNumber'];
-    $days = isset($_GET['days']) ? $_GET['days'] : 'all'; 
+    $days = isset($_GET['days']) ? $_GET['days'] : 'all';
+    $sort = isset($_GET['sort']) ? $_GET['sort'] : 'desc';
 
-    //  value of $days
+    $order_clause = 'ORDER BY oh.ORDER_DATE DESC'; 
+
+    if ($sort === 'asc') {
+        $order_clause = 'ORDER BY oh.ORDER_DATE ASC';
+    }
+
+    // Construct the query
     if ($days === 'all') {
         $query = "SELECT oi.*, oh.ORDER_DATE, oh.GRAND_TOTAL, p.NAME, p.IMAGE, (oi.QUANTITY * oi.UNIT_PRICE) AS TOTAL_PRICE, 
                          SUM(oi.QUANTITY) OVER() AS TOTAL_PRODUCT_COUNT
@@ -15,9 +21,10 @@ if (isset($_SESSION['phoneNumber'])) {
                   JOIN product p ON oi.PRODUCT_ID = p.PRODUCT_ID
                   JOIN order_header oh ON oi.ORDER_ID = oh.ORDER_ID
                   WHERE oi.CHANGE_BY_USER_LOGIN_ID = '$userLoginId'
-                  ORDER BY oi.ORDER_ID DESC";
+                  $order_clause";
     } else {
         $days = intval($days); //  $days is an integer
+
         $query = "SELECT oi.*, oh.ORDER_DATE, oh.GRAND_TOTAL, p.NAME, p.IMAGE, (oi.QUANTITY * oi.UNIT_PRICE) AS TOTAL_PRICE, 
                          SUM(oi.QUANTITY) OVER() AS TOTAL_PRODUCT_COUNT
                   FROM order_item oi 
@@ -25,7 +32,7 @@ if (isset($_SESSION['phoneNumber'])) {
                   JOIN order_header oh ON oi.ORDER_ID = oh.ORDER_ID
                   WHERE oi.CHANGE_BY_USER_LOGIN_ID = '$userLoginId'
                   AND oh.ORDER_DATE >= DATE_SUB(CURDATE(), INTERVAL $days DAY)
-                  ORDER BY oi.ORDER_ID DESC";
+                  $order_clause";
     }
 
     $result = mysqli_query($conn, $query);
@@ -37,7 +44,7 @@ if (isset($_SESSION['phoneNumber'])) {
         if (mysqli_num_rows($result) > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
                 $order_history[] = $row;
-                $total_product_count = $row['TOTAL_PRODUCT_COUNT']; // Getting total product count from the query result
+                $total_product_count = $row['TOTAL_PRODUCT_COUNT']; //total product count 
             }
         } else {
             echo '<p>No orders found.</p>';
@@ -50,7 +57,6 @@ if (isset($_SESSION['phoneNumber'])) {
     // Session is not set
     echo '<p>User phone number not found in session.</p>';
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -73,13 +79,17 @@ if (isset($_SESSION['phoneNumber'])) {
     <!-- Order History Section -->
     <div class="container">
         <form method="get" class="mb-4 text-right">
-            <select name="days" id="days" class="custom-select w-auto" onchange="this.form.submit()">
+            <select name="days" id="days" class="custom-select w-auto mr-2" onchange="this.form.submit()">
                 <option>Back days history</option>
                 <option value="0">1 day</option>
                 <option value="7">1 week</option>
                 <option value="30">1 month</option>
                 <option value="365">1 year</option>
                 <option value="all">All times</option>
+            </select>
+            <select name="sort" id="sort" class="custom-select w-auto" onchange="this.form.submit()">
+                <option value="desc" <?php if ($sort === 'desc') echo 'selected'; ?>>Date Descending</option>
+                <option value="asc" <?php if ($sort === 'asc') echo 'selected'; ?>>Date Ascending</option>
             </select>
         </form>
 
@@ -101,7 +111,33 @@ if (isset($_SESSION['phoneNumber'])) {
                 echo '</div>';
                 echo '</div>';
                 echo '<div class="mt-3">';
-                echo '<a href="show_products.php?product_id=' . $order['PRODUCT_ID'] . '" class="btn btn-warning btn-sm"><i class="fa fa-refresh" aria-hidden="true"></i> Buy again</a>';
+                echo '<button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#productModal' . $order['PRODUCT_ID'] . '"><i class="fa fa-refresh" aria-hidden="true"></i> Buy again</button>';
+                echo '</div>';
+                echo '</div>';
+
+                // Modal for each product
+                echo '<div class="modal fade" id="productModal' . $order['PRODUCT_ID'] . '" tabindex="-1" role="dialog" aria-labelledby="productModalLabel' . $order['PRODUCT_ID'] . '" aria-hidden="true">';
+                echo '<div class="modal-dialog modal-dialog-centered " role="document">';
+                echo '<div class="modal-content">';
+                echo '<div class="modal-header">';
+                echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+                echo '<span aria-hidden="true">&times;</span>';
+                echo '</button>';
+                echo '</div>';
+                echo '<div class="modal-body">';
+                echo '<div class="text-center">';
+                echo '<img src="' . $order['IMAGE'] . '" alt="Product Image" class="img-fluid mb-3 mx-auto d-block" style="width:250px; height: auto;">';
+                echo '</div>';
+                echo '<h6 class="modal-title text-center" id="productModalLabel' . $order['PRODUCT_ID'] . '">' . $order['NAME'] . '</h6>';
+                // echo '<p><strong>Quantity:</strong> ' . $order['QUANTITY'] . '</p>';/
+                echo '<p><strong>Price:</strong> &#8377;' . $order['UNIT_PRICE'] . '</p>';
+                // echo '<p><strong>Total Price:</strong> &#8377;' . $order['TOTAL_PRICE'] . '</p>';
+                echo '</div>';
+                echo '<div class="modal-footer">';
+                echo '<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>';
+                echo '<button type="button" class="btn btn-primary">Add to Cart</button>';
+                echo '</div>';
+                echo '</div>';
                 echo '</div>';
                 echo '</div>';
             }
