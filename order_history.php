@@ -7,7 +7,7 @@ if (isset($_SESSION['phoneNumber'])) {
     $days = isset($_GET['days']) ? $_GET['days'] : 'all';
     $sort = isset($_GET['sort']) ? $_GET['sort'] : 'desc';
 
-    $order_clause = 'ORDER BY oh.ORDER_DATE DESC'; 
+    $order_clause = 'ORDER BY oh.ORDER_DATE DESC';
 
     if ($sort === 'asc') {
         $order_clause = 'ORDER BY oh.ORDER_DATE ASC';
@@ -79,7 +79,7 @@ if (isset($_SESSION['phoneNumber'])) {
     <!-- Order History Section -->
     <div class="container">
         <form method="get" class="mb-4 text-right">
-            <select name="days" id="days" class="custom-select w-auto mr-2" onchange="this.form.submit()">
+            <select name="days" id="days" class="custom-select w-auto mr-2">
                 <option>Back days history</option>
                 <option value="0">1 day</option>
                 <option value="7">1 week</option>
@@ -87,65 +87,111 @@ if (isset($_SESSION['phoneNumber'])) {
                 <option value="365">1 year</option>
                 <option value="all">All times</option>
             </select>
-            <select name="sort" id="sort" class="custom-select w-auto" onchange="this.form.submit()">
+            <select name="sort" id="sort" class="custom-select w-auto">
                 <option value="desc" <?php if ($sort === 'desc') echo 'selected'; ?>>Date Descending</option>
                 <option value="asc" <?php if ($sort === 'asc') echo 'selected'; ?>>Date Ascending</option>
             </select>
+            <button type="submit" class="btn btn-warning ml-2">Apply Filters</button>
         </form>
 
-        <?php
-        if (!empty($order_history)) {
-            echo '<div class="text-right mb-4"><strong>Total Products Ordered: ' . $total_product_count . '</strong></div>';
-            foreach ($order_history as $order) {
-                echo '<div class="border p-3 mb-3 rounded">';
-                echo '<div class="d-flex justify-content-between mb-3">';
-                echo '<div class="small">ORDER DATE: ' . $order['ORDER_DATE'] . '</div>';
-                echo '</div>';
-                echo '<div class="d-flex align-items-center">';
-                echo '<img src="' . $order['IMAGE'] . '" alt="Product Image" class="img-thumbnail mr-3" style="width: 125px;">';
-                echo '<div>';
-                echo '<div><strong>' . $order['NAME'] . '</strong></div>';
-                echo '<div>Quantity: ' . $order['QUANTITY'] . '</div>';
-                echo '<div>Unit Price: &#8377;' . $order['UNIT_PRICE'] . '</div>';
-                echo '<div>Total Price: &#8377;' . $order['TOTAL_PRICE'] . '</div>';
-                echo '</div>';
-                echo '</div>';
-                echo '<div class="mt-3">';
-                echo '<button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#productModal' . $order['PRODUCT_ID'] . '"><i class="fa fa-refresh" aria-hidden="true"></i> Buy again</button>';
-                echo '</div>';
-                echo '</div>';
+        <?php if (!empty($order_history)) : ?>
+            <div class="text-right mb-4"><strong>Total Products Ordered: <?php echo $total_product_count; ?></strong></div>
+            <?php foreach ($order_history as $order) : ?>
+                <div class="border p-3 mb-3 rounded">
+                    <div class="d-flex justify-content-between mb-3">
+                        <div class="small">ORDER DATE: <?php echo $order['ORDER_DATE']; ?></div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <img src="<?php echo $order['IMAGE']; ?>" alt="Product Image" class="img-thumbnail mr-3" style="width: 125px;">
+                        <div>
+                            <div><strong><?php echo $order['NAME']; ?></strong></div>
+                            <div>Quantity: <?php echo $order['QUANTITY']; ?></div>
+                            <div>Unit Price: &#8377;<?php echo $order['UNIT_PRICE']; ?></div>
+                            <div>Total Price: &#8377;<?php echo $order['TOTAL_PRICE']; ?></div>
+                            <div>Size: <?php echo $order['SIZE']; ?></div>
+                            <div>
+                                Colour:
+                                <div class="rounded-circle d-inline-block border" style="width: 20px; height: 20px; background-color: <?php echo $order['COLOUR']; ?>;"></div>
+                            </div>
 
-                // Modal for each product
-                echo '<div class="modal fade" id="productModal' . $order['PRODUCT_ID'] . '" tabindex="-1" role="dialog" aria-labelledby="productModalLabel' . $order['PRODUCT_ID'] . '" aria-hidden="true">';
-                echo '<div class="modal-dialog modal-dialog-centered " role="document">';
-                echo '<div class="modal-content">';
-                echo '<div class="modal-header">';
-                echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
-                echo '<span aria-hidden="true">&times;</span>';
-                echo '</button>';
-                echo '</div>';
-                echo '<div class="modal-body">';
-                echo '<div class="text-center">';
-                echo '<img src="' . $order['IMAGE'] . '" alt="Product Image" class="img-fluid mb-3 mx-auto d-block" style="width:250px; height: auto;">';
-                echo '</div>';
-                echo '<h6 class="modal-title text-center" id="productModalLabel' . $order['PRODUCT_ID'] . '">' . $order['NAME'] . '</h6>';
-                // echo '<p><strong>Quantity:</strong> ' . $order['QUANTITY'] . '</p>';/
-                echo '<p><strong>Price:</strong> &#8377;' . $order['UNIT_PRICE'] . '</p>';
-                // echo '<p><strong>Total Price:</strong> &#8377;' . $order['TOTAL_PRICE'] . '</p>';
-                echo '</div>';
-                echo '<div class="modal-footer">';
-                echo '<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>';
-                echo '<button type="button" class="btn btn-primary">Add to Cart</button>';
-                echo '</div>';
-                echo '</div>';
-                echo '</div>';
-                echo '</div>';
-            }
-        } else {
-            echo '<h4>No orders found.</h4>';
-        }
-        ?>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#productModal<?php echo $order['PRODUCT_ID']; ?>">
+                            <i class="fa fa-refresh" aria-hidden="true"></i> Buy again
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modal for each product -->
+                <div class="modal fade" id="productModal<?php echo $order['PRODUCT_ID']; ?>" tabindex="-1" role="dialog" aria-labelledby="productModalLabel<?php echo $order['PRODUCT_ID']; ?>" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered " role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="text-center">
+                                    <img src="<?php echo $order['IMAGE']; ?>" alt="Product Image" class="img-fluid mb-3 mx-auto d-block" style="width:250px; height: auto;">
+                                </div>
+                                <h6 class="modal-title text-center" id="productModalLabel<?php echo $order['PRODUCT_ID']; ?>"><?php echo $order['NAME']; ?></h6>
+
+                                <div><strong>Size: </strong><span class="font-italic"><?php echo $order['SIZE']; ?></span></div>
+                                <div class="font-weight-bold">
+                                    Colour:
+                                    <div class="rounded-circle mx-1 d-inline-block border" style="width: 20px; height: 20px; background-color: <?php echo $order['COLOUR']; ?>;"></div>
+                                </div>
+                                <p><strong>Price:</strong><span class="font-italic"> &#8377;<?php echo $order['UNIT_PRICE']; ?></span></p>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary add-to-cart-btn" data-product-id="<?php echo $order['PRODUCT_ID']; ?>" data-product-name="<?php echo $order['NAME']; ?>" data-product-price="<?php echo $order['UNIT_PRICE']; ?>" data-product-image="<?php echo $order['IMAGE']; ?>" data-product-size="<?php echo $order['SIZE']; ?>" data-product-color="<?php echo $order['COLOUR']; ?>">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php else : ?>
+            <h4>No orders found...</h4>
+        <?php endif; ?>
+
     </div>
+
+    <script>
+        $(document).ready(function() {
+            $('.add-to-cart-btn').click(function() {
+                var productId = $(this).data('product-id');
+                var productName = $(this).data('product-name');
+                var productPrice = $(this).data('product-price');
+                var productImage = $(this).data('product-image');
+                var productSize = $(this).data('product-size');
+                var productColor = $(this).data('product-color');
+
+                $.ajax({
+                    url: 'add_to_cart.php',
+                    method: 'POST',
+                    data: {
+                        main_product_id: productId,
+                        name: productName,
+                        price: productPrice,
+                        image: productImage,
+                        size: productSize,
+                        color: productColor
+                    },
+                    success: function(response) {
+                        alert('Product added to cart successfully.');
+                        location.reload(); 
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error adding product to cart:', error);
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>
