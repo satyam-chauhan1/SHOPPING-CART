@@ -24,8 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $orderID = $conn->real_escape_string($orderID);
 
             // Construct the SQL query for order_header
-            $order_header_sql = "INSERT INTO order_header (ORDER_ID, ORDER_DATE, STATUS_ID, CREATED_BY, DATE,PAYMENT_METHOD, CURRENCY, REMAINING_SUB_TOTAL, GRAND_TOTAL) 
-                  VALUES ('$orderID', '$orderDateTime', '$statusId', '$createdBy','$orderDate', '$paymentMethod', '$currency', '$totalPrice', '$totalPrice')";
+            $order_header_sql = "INSERT INTO order_header (ORDER_ID, ORDER_DATE, STATUS_ID, CREATED_BY, DATE, PAYMENT_METHOD, CURRENCY, REMAINING_SUB_TOTAL, GRAND_TOTAL) 
+                  VALUES ('$orderID', '$orderDateTime', '$statusId', '$createdBy', '$orderDate', '$paymentMethod', '$currency', '$totalPrice', '$totalPrice')";
             // Execute the query
             if ($conn->query($order_header_sql) === TRUE) {
                 // echo "Order ID $orderID inserted successfully.";
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     // Construct the SQL query for order_adjustment
                     $order_adjustment_sql = "INSERT INTO order_adjustment (ORDER_ADJUSTMENT_ID, ORDER_ID, AMOUNT, DESCRIPTION) 
-                                             VALUES ('$orderAdjustmentId', '$orderID','$discountAmount', 'Discount of $discountPercentage% on ₹$totalPrice is ₹$discountAmount')";
+                                             VALUES ('$orderAdjustmentId', '$orderID', '$discountAmount', 'Discount of $discountPercentage% on ₹$totalPrice is ₹$discountAmount')";
 
                     // Execute the query
                     if ($conn->query($order_adjustment_sql) === TRUE) {
@@ -57,14 +57,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $relatedProductId = isset($item['related_product_id']) ? $conn->real_escape_string($item['related_product_id']) : null;
                             $productId = !empty($mainProductId) ? $mainProductId : $relatedProductId;
 
-
                             $quantity = $conn->real_escape_string($item['quantity']);
                             $price = $conn->real_escape_string($item['price']);
+                            $size = isset($item['size']) ? $conn->real_escape_string($item['size']) : 'N/A';
+                            $color = isset($item['color']) ? $conn->real_escape_string($item['color']) : 'N/A';
+                        
 
                             $sequenceId = "SEQ_ID00" . $seqId;
 
-                            $order_item_sql = "INSERT INTO order_item (ORDER_ID,PRODUCT_ID,SEQUENCE_ID,QUANTITY,UNIT_PRICE,IS_PROMO,CHANGE_BY_USER_LOGIN_ID,ITEM_ORDER_DATETIME) 
-                                               VALUES ('$orderID','$productId','$sequenceId','$quantity','$price','Y','$userLoginId','$orderDateTime')";
+                            $order_item_sql = "INSERT INTO order_item (ORDER_ID, PRODUCT_ID, SEQUENCE_ID, QUANTITY, UNIT_PRICE, IS_PROMO, CHANGE_BY_USER_LOGIN_ID, ITEM_ORDER_DATETIME,SIZE,COLOUR) 
+                                               VALUES ('$orderID', '$productId', '$sequenceId', '$quantity', '$price', 'Y', '$userLoginId', '$orderDateTime', '$size','$color')";
 
                             if ($conn->query($order_item_sql) === TRUE) {
                                 echo "Order Item $orderID inserted successfully with SEQ_ID $sequenceId.";
@@ -96,3 +98,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
 }
+?>
