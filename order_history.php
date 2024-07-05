@@ -148,7 +148,7 @@ if (isset($_SESSION['phoneNumber'])) {
                                 <!-- quantity  -->
                                 <div class="quantity-control my-3">
                                     <strong>Quantity :</strong>
-                                    <input type="number" id="quantityInput<?php echo $order['PRODUCT_ID']; ?>" class="form-control d-inline-block w-25 text-center" value="1" min="1" >
+                                    <input type="number" id="quantityInput<?php echo $order['PRODUCT_ID']; ?>" class="form-control d-inline-block w-25 text-center" value="1" min="1">
                                 </div>
                             </div>
 
@@ -198,6 +198,22 @@ if (isset($_SESSION['phoneNumber'])) {
                     }
                 });
             });
+
+            function updateCartCount() {
+                $.ajax({
+                    url: 'historyProducts_count_in_navbar.php',
+                    method: 'GET',
+                    success: function(response) {
+                        $('#cart-count').text(response.cart_count);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching cart count:', error);
+                    }
+                });
+            }
+
+            // Call updateCartCount on page load to initialize the cart count
+            updateCartCount();
 
             $('.increase-quantity').click(function() {
                 var inputField = $($(this).data('target'));
