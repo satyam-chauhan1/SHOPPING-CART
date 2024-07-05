@@ -9,44 +9,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $productImage = $_POST['image'];
     $productSize = $_POST['size'];
     $productColor = $_POST['color'];
+    $quantity = $_POST['quantity'];
 
-    // Check if the product exists in the product table
-    $query = "SELECT * FROM product WHERE PRODUCT_ID = '$productId'";
-    $result = mysqli_query($conn, $query);
+    // Assuming you have a cart session variable
+    if (!isset($_SESSION['cart'])) {
+        $_SESSION['cart'] = [];
+    }
 
-    if (mysqli_num_rows($result) > 0) {
-        $cartItem = array(
+    // Check if the product is already in the cart
+    $productExists = false;
+    foreach ($_SESSION['cart'] as &$item) {
+        if ($item['main_product_id'] == $productId && $item['size'] == $productSize && $item['color'] == $productColor) {
+            $item['quantity'] += $quantity;
+            $productExists = true;
+            break;
+        }
+    }
+
+    if (!$productExists) {
+        $_SESSION['cart'][] = [
             'main_product_id' => $productId,
             'name' => $productName,
             'price' => $productPrice,
             'image' => $productImage,
             'size' => $productSize,
             'color' => $productColor,
-            'quantity' => 1
-        );
-
-        if (!isset($_SESSION['cart'])) {
-            $_SESSION['cart'] = array();
-        }
-
-        $productFound = false;
-        foreach ($_SESSION['cart'] as &$item) {
-            if ($item['main_product_id'] == $productId && $item['size'] == $productSize && $item['color'] == $productColor) {
-                $item['quantity'] += 1;
-                $productFound = true;
-                break;
-            }
-        }
-
-        if (!$productFound) {
-            $_SESSION['cart'][] = $cartItem;
-        }
-
-        echo json_encode(array('status' => 'success'));
-    } else {
-        echo json_encode(array('status' => 'error', 'message' => 'Product not found.'));
+            'quantity' => $quantity
+        ];
     }
-} else {
-    echo json_encode(array('status' => 'error', 'message' => 'Invalid request method.'));
+
+    echo 'Product added to cart successfully';
 }
 ?>

@@ -144,11 +144,17 @@ if (isset($_SESSION['phoneNumber'])) {
                                     <div class="rounded-circle mx-1 d-inline-block border" style="width: 20px; height: 20px; background-color: <?php echo $order['COLOUR']; ?>;"></div>
                                 </div>
                                 <p><strong>Price:</strong><span class="font-italic"> &#8377;<?php echo $order['UNIT_PRICE']; ?></span></p>
+
+                                <!-- quantity  -->
+                                <div class="quantity-control my-3">
+                                    <strong>Quantity :</strong>
+                                    <input type="number" id="quantityInput<?php echo $order['PRODUCT_ID']; ?>" class="form-control d-inline-block w-25 text-center" value="1" min="1" >
+                                </div>
                             </div>
 
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary add-to-cart-btn" data-product-id="<?php echo $order['PRODUCT_ID']; ?>" data-product-name="<?php echo $order['NAME']; ?>" data-product-price="<?php echo $order['UNIT_PRICE']; ?>" data-product-image="<?php echo $order['IMAGE']; ?>" data-product-size="<?php echo $order['SIZE']; ?>" data-product-color="<?php echo $order['COLOUR']; ?>">Add to Cart</button>
+                                <button type="button" class="btn btn-primary add-to-cart-btn" data-product-id="<?php echo $order['PRODUCT_ID']; ?>" data-product-name="<?php echo $order['NAME']; ?>" data-product-price="<?php echo $order['UNIT_PRICE']; ?>" data-product-image="<?php echo $order['IMAGE']; ?>" data-product-size="<?php echo $order['SIZE']; ?>" data-product-color="<?php echo $order['COLOUR']; ?>" data-quantity-input="#quantityInput<?php echo $order['PRODUCT_ID']; ?>">Add to Cart</button>
                             </div>
                         </div>
                     </div>
@@ -169,6 +175,7 @@ if (isset($_SESSION['phoneNumber'])) {
                 var productImage = $(this).data('product-image');
                 var productSize = $(this).data('product-size');
                 var productColor = $(this).data('product-color');
+                var quantity = $($(this).data('quantity-input')).val();
 
                 $.ajax({
                     url: 'add_to_cart.php',
@@ -179,19 +186,35 @@ if (isset($_SESSION['phoneNumber'])) {
                         price: productPrice,
                         image: productImage,
                         size: productSize,
-                        color: productColor
+                        color: productColor,
+                        quantity: quantity
                     },
                     success: function(response) {
                         alert('Product added to cart successfully.');
-                        location.reload(); 
+                        location.reload();
                     },
                     error: function(xhr, status, error) {
                         console.error('Error adding product to cart:', error);
                     }
                 });
             });
+
+            $('.increase-quantity').click(function() {
+                var inputField = $($(this).data('target'));
+                var currentValue = parseInt(inputField.val());
+                inputField.val(currentValue + 1);
+            });
+
+            $('.decrease-quantity').click(function() {
+                var inputField = $($(this).data('target'));
+                var currentValue = parseInt(inputField.val());
+                if (currentValue > 1) {
+                    inputField.val(currentValue - 1);
+                }
+            });
         });
     </script>
+
 </body>
 
 </html>
